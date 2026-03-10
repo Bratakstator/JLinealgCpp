@@ -8,6 +8,8 @@ using Objects::Vector;
 using Objects::Matrix;
 
 int main() {
+    Logging::setup();
+
     Vector v(4);
     Matrix A(4, 4);
 
