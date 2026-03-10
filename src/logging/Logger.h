@@ -15,6 +15,11 @@ namespace Logging {
         CRIT
     };
 
+    enum class Level {
+        BASIC,
+        VERBOSE
+    };
+
 
     static std::ofstream file_;
 
