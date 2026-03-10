@@ -15,11 +15,6 @@ namespace Logging {
         CRIT
     };
 
-    enum class Level {
-        BASIC,
-        VERBOSE
-    };
-
 
     static std::ofstream file_;
 
@@ -32,7 +27,11 @@ namespace Logging {
     }
 
     static void setup() {
-        if (const std::filesystem::path path("../dirs/logs"); !std::filesystem::exists(path)) std::filesystem::create_directories(path);
+        if (const std::filesystem::path path("../dirs/logs"); !std::filesystem::exists(path)) {
+            std::cout << "Creating path: '../dirs/logs'" << "\n";
+            std::filesystem::create_directories(path);
+            std::cout << "Path created";
+        }
         file_ = std::ofstream("../dirs/logs/log_verbose.log");
     }
 } // Logging
