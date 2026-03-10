@@ -12,7 +12,7 @@ namespace Logging {
         CRIT
     };
 
-    static std::string typeTstring(Type type) {
+    static std::string typeTstring(const Type type) {
         if (type == Type::INFO) return "[INFO]";
         else if (type == Type::WARN) return "[WARN]";
         else if (type == Type::CRIT) return "[CRIT]";
