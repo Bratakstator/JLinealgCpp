@@ -6,7 +6,6 @@
 
 using Objects::Vector;
 using Objects::Matrix;
-using Logging::Logger;
 
 int main() {
     Vector v(4);
