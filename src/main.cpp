@@ -13,8 +13,6 @@ int main() {
     Vector v(4);
     Matrix A(4, 4);
 
-    std::cout << "After making v and A" << "\n";
-
     A[0][0] = 5;
     A[0][1] = 3;
     A[0][2] = 6;
@@ -35,18 +33,11 @@ int main() {
     A[3][2] = 6;
     A[3][3] = 4;
 
-    std::cout << "After inserting into A" << "\n";
-
     A.print();
 
-    std::cout << "After printing A" << "\n";
-
     auto [fst, snd] = A.LU();
-    std::cout << "After making LU" << "\n";
     fst.print();
-    std::cout << "After printing L" << "\n";
     snd.print();
-    std::cout << "After printing U" << "\n";
 
     return 0;
 }
