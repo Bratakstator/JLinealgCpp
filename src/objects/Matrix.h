@@ -24,7 +24,6 @@ namespace Objects {
             delete vecs_;
         }
 
-
         Vector& operator[](const int n) { //NOLINT
             return vecs_[n];
         }
