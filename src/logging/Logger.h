@@ -18,10 +18,10 @@ namespace Logging {
 
 
     inline std::string typeTstring(const Type type) {
-        if (type == Type::INFO) return "[INFO] ";
-        else if (type == Type::WARN) return "[WARN] ";
-        else if (type == Type::CRIT) return "[CRIT] ";
-        else return "[????] ";
+        if (type == Type::INFO)         return "[INFO]    ";
+        else if (type == Type::WARN)    return "[WARNING] ";
+        else if (type == Type::CRIT)    return "[CRITICAL]";
+        else                            return "[????]    ";
     }
 
     static void setup() {
