@@ -20,7 +20,9 @@ int main() {
 
     Matrix B = A * A;
 
-    std::cout << B[1, 2];
+    std::cout << B[0, 0] << "\t" << B[0, 1] << "\t" << B[0, 2] << "\n";
+    std::cout << B[1, 0] << "\t" << B[1, 1] << "\t" << B[1, 2] << "\n";
+    std::cout << B[2, 0] << "\t" << B[2, 1] << "\t" << B[2, 2] << "\n";
 
     return 0;
 }

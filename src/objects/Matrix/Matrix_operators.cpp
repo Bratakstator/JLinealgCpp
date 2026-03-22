@@ -29,7 +29,7 @@ namespace Objects {
         for (int m = 0; m < rows(); m++) {
             for (int n = 0; n < other.columns(); n++) {
                 for (int cxr = 0; cxr < columns(); cxr++) {
-                    C[m, n] += (*this)[m, cxr] * other[cxr, m];
+                    C[m, n] += (*this)[m, cxr] * other[cxr, n];
                 }
             }
         }
