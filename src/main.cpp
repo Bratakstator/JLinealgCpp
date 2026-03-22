@@ -6,10 +6,6 @@ using Objects::Vector;
 using Objects::Matrix;
 
 int main() {
-    /*
-     * Look into using allocators instead of dynamic new / delete
-     */
-
     Logging::setup();
 
     Matrix A(
