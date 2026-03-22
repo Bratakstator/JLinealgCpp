@@ -8,7 +8,7 @@
 #include <cmath>
 #include <sstream>
 
-#include "Matrix.h"
+#include "../Matrix/Matrix.h"
 
 //  ________________
 // {| a1 | a2 | a3 |
@@ -57,7 +57,7 @@ namespace Objects {
 
         DoubleProxy& operator+=(const double val) {
             if (isNullPtr_) return *this;
-            element_ = val;
+            element_ += val;
             changed_ = true;
             dim_changed_ = true;
 

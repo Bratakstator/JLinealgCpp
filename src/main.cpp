@@ -1,6 +1,6 @@
 #include "logging/Logger.h"
-#include "objects/Matrix.h"
-#include "objects/Vector.h"
+#include "objects/Matrix/Matrix.h"
+#include "objects/Vector/Vector.h"
 
 using Objects::Vector;
 using Objects::Matrix;

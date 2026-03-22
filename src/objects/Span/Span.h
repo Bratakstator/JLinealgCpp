@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "Vector.h"
+#include "../Vector/Vector.h"
 
 //  ________________
 // {| a1 | a2 | a3 |

@@ -5,7 +5,7 @@
 #ifndef JLINEALGCPP_MATRIX_H
 #define JLINEALGCPP_MATRIX_H
 
-#include "Span.h"
+#include "../Span/Span.h"
 
 namespace Objects {
     class Matrix {
@@ -62,7 +62,7 @@ namespace Objects {
                 }
             }
 
-            return *this;
+            return C;
         }
 
 
