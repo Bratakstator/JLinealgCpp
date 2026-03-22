@@ -2,7 +2,9 @@
 // Created by Joakim on 22.03.2026.
 //
 
+#include "../Matrix/Matrix.h"
 #include "Span.h"
+#include "../Vector/Vector.h"
 
 namespace Objects {
     Span::Span() { space_ = new Vector[1]; }

@@ -3,6 +3,8 @@
 //
 
 #include "Matrix.h"
+#include "../Span/Span.h"
+#include "../Vector/Vector.h"
 
 namespace Objects {
     DoubleProxy Matrix::operator[](int m, int n) {
