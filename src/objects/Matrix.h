@@ -14,7 +14,13 @@ namespace Objects {
         int identity_ = 1; // -1: not calculated, 0: false, 1: true
 
     public:
-        Matrix() = default;
+        Matrix() {
+            span_ = Span({
+                {1, 0, 0},
+                {0, 1, 0},
+                {0, 0, 1}
+            });
+        }
         explicit Matrix(const Span &span) {
             identity_ = -1;
             span_ = span;
