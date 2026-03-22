@@ -6,6 +6,10 @@ using Objects::Vector;
 using Objects::Matrix;
 
 int main() {
+    /*
+     * Look into using allocators instead of dynamic new / delete
+     */
+
     Logging::setup();
 
     Matrix A(
@@ -15,6 +19,8 @@ int main() {
     );
 
     Matrix B = A * A;
+
+    std::cout << B[1, 2];
 
     return 0;
 }

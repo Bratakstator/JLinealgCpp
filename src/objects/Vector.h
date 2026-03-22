@@ -8,6 +8,8 @@
 #include <cmath>
 #include <sstream>
 
+#include "Matrix.h"
+
 //  ________________
 // {| a1 | a2 | a3 |
 //  | a4 | a5 | a6 |
@@ -18,16 +20,19 @@ namespace Objects {
     class DoubleProxy {
         double &element_;
         bool &changed_;
+        bool &dim_changed_;
         bool &isNullPtr_;
 
     public:
+        friend class VectorProxy;
         DoubleProxy(double &element, bool &changed, bool &isNullPtr)
-            : element_(element), changed_(changed), isNullPtr_(isNullPtr) {}
+            : element_(element), changed_(changed), dim_changed_(changed), isNullPtr_(isNullPtr)
+        {}
+        DoubleProxy(double &element, bool &changed, bool &dim_changed, bool &isNullPtr)
+            : element_(element), changed_(changed), dim_changed_(dim_changed), isNullPtr_(isNullPtr)
+        {}
 
         operator double() { // NOLINT
-            return element_;
-        }
-        operator double() const { // NOLINT
             return element_;
         }
 
@@ -36,6 +41,7 @@ namespace Objects {
 
             element_ = val;
             changed_ = true;
+            dim_changed_ = true;
             return *this;
         }
         DoubleProxy& operator=(const DoubleProxy &other) {
@@ -43,15 +49,24 @@ namespace Objects {
 
             if (this != &other) {
                 element_ = other.element_;
-                changed_ = other.changed_;
                 changed_ = true;
+                dim_changed_ = true;
             }
+            return *this;
+        }
+
+        DoubleProxy& operator+=(const double val) {
+            if (isNullPtr_) return *this;
+            element_ = val;
+            changed_ = true;
+            dim_changed_ = true;
+
             return *this;
         }
     };
 
     class Vector {
-        double *elements_ = new double(0);
+        double *elements_ = nullptr;
         int n_ = 0;
 
         double norm_ = 0;
@@ -60,11 +75,12 @@ namespace Objects {
         bool isNullPtr = true;
 
     public:
+        friend class VectorProxy;
         /**
          * Default constructor.\n
          * Initializes vector as a null vector.
          */
-        Vector() = default;
+        Vector() { elements_ = new double[1]; }
 
         /**
          * Constructs vector from initializer list.\n
@@ -85,17 +101,17 @@ namespace Objects {
             if (norm() == 0) {
                 n_ = 0;
                 delete elements_;
-                elements_ = new double(0);
+                elements_ = new double[1];
                 changed_ = true;
             }
             else isNullPtr = false;
         }
 
         Vector(const Vector &other) {
-            n_ = other.size();
-            isNullPtr = other.is_null_vec();
-
-            if (isNullPtr) return;
+            n_ = other.n_;
+            norm_ = other.norm_;
+            changed_ = other.changed_;
+            isNullPtr = other.isNullPtr;
 
             elements_ = new double[n_];
             for (int i = 0; i < n_; i++) {
@@ -103,7 +119,35 @@ namespace Objects {
             }
         }
 
-        ~Vector() { delete elements_; }
+        explicit Vector(const int n) {
+            n_ = n;
+            elements_ = new double[n_];
+            isNullPtr = false;
+
+            for (int i = 0; i < n_; i++) {
+                elements_[i] = 0;
+            }
+        }
+
+        ~Vector() {
+            delete[] elements_;
+            elements_ = nullptr;
+        }
+
+        Vector& operator=(const Vector &other) {
+            if (this == &other) return *this;
+            n_ = other.n_;
+            norm_ = other.norm_;
+            changed_ = other.changed_;
+            isNullPtr = other.isNullPtr;
+
+            elements_ = new double[n_];
+
+            for (int i = 0; i < n_; i++) {
+                elements_[i] = other.elements_[i];
+            }
+            return *this;
+        }
 
 
         DoubleProxy operator[](int p) { // NOLINT
@@ -130,7 +174,7 @@ namespace Objects {
         Vector& operator+=(const Vector &other) {
             if (isNullPtr && !other.is_null_vec()) {
                 n_ = other.size();
-                delete elements_;
+                delete[] elements_;
                 elements_ = new double[n_];
 
                 for (int i = 0; i < n_; i++) elements_[i] = other[i];
@@ -150,7 +194,7 @@ namespace Objects {
         Vector& operator-=(const Vector &other) {
             if (isNullPtr && !other.is_null_vec()) {
                 n_ = other.size();
-                delete elements_;
+                delete[] elements_;
                 elements_ = new double[n_];
 
                 for (int i = 0; i < n_; i++) elements_[i] = -other[i];
@@ -181,9 +225,7 @@ namespace Objects {
             if (!changed_) return norm_;
 
             double sum = 0;
-            for (int i = 0; i < n_; i++) {
-                sum = elements_[i] * elements_[i];
-            }
+            for (int i = 0; i < n_; i++) sum += elements_[i] * elements_[i];
             norm_ = std::sqrt(sum);
             changed_ = false;
 

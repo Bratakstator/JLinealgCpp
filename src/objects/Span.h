@@ -9,13 +9,52 @@
 
 #include "Vector.h"
 
+//  ________________
+// {| a1 | a2 | a3 |
+//  | a4 | a5 | a6 |
+//  | a7 | a8 | a9 |}
+//  ----------------
+
 namespace Objects {
+    class VectorProxy {
+        Vector &vector_;
+        bool &dim_changed_;
+
+    public:
+        VectorProxy(Vector &vector, bool &dim_changed)
+            : vector_(vector), dim_changed_(dim_changed)
+        {}
+
+        operator Vector() { return vector_; } // NOLINT
+
+        VectorProxy& operator=(const Vector &other) {
+            vector_ = other;
+            dim_changed_ = true;
+            return *this;
+        }
+        VectorProxy& operator=(const VectorProxy &other) {
+            if (this != &other) {
+                vector_ = other.vector_;
+                dim_changed_ = true;
+            }
+            return *this;
+        }
+
+        DoubleProxy operator[](int p) { // NOLINT
+            const auto proxy(vector_[p]);
+            return {proxy.element_, proxy.changed_, dim_changed_, proxy.isNullPtr_};
+        }
+        double operator[](const int p) const {
+            return vector_[p];
+        }
+    };
+
     class Span {
         Vector *space_ = nullptr;
         int n_ = 0;
         int dim_ = 0;
 
-        bool dim_calculated = false;
+        bool dim_changed = true;
 
         int any_row_with_non_zero_in_col(const int r_, const int c_) { // NOLINT
             for (int r = r_; r < n_; r++) {
@@ -26,33 +65,11 @@ namespace Objects {
 
         void set_dim() {
             dim_ = 0;
-            for (int rPivot = 0; rPivot < n_; rPivot++) {
-                if (space_[rPivot].norm() != 0) dim_++;
-                for (int cPivot = rPivot; cPivot < room(); cPivot++) {
-                    auto element = space_[rPivot][cPivot];
-                    if (element == 0) {
-                        auto r_swap = any_row_with_non_zero_in_col(rPivot, cPivot);
-                        if (rPivot != r_swap) swap(rPivot, r_swap);
-                        else continue;
-                    }
-
-                    for (int c = cPivot; c < room(); c++) {
-                        space_[rPivot][c] = space_[rPivot][c] / element;
-                    }
-                    for (int r = rPivot + 1; r < n_; r++) {
-                        auto div = space_[r][cPivot];
-                        if (div != 0) {
-                            for (int c = cPivot; c < room(); c++) {
-                                space_[r][c] = (space_[r][c] / div) - space_[r - rPivot][c];
-                            }
-                        }
-                    }
-                }
-            }
+            Span copy(*this);
         }
 
     public:
-        Span() { space_ = new Vector(); }
+        Span() { space_ = new Vector[1]; }
         explicit Span(const std::initializer_list<Vector> space) {
             n_ = space.size();
             space_ = new Vector[n_];
@@ -64,18 +81,58 @@ namespace Objects {
             }
             set_dim();
         }
-        ~Span() { delete space_; }
+        explicit Span(const Span &other) {
+            n_ = other.size();
+            space_ = new Vector[n_];
+            dim_ = other.dim_;
+            dim_changed = other.dim_changed;
+
+            int i = 0;
+            for (auto &vector : other) {
+                space_[i] = vector;
+                i++;
+            }
+        }
+        explicit Span(const int m, const int n) {
+            n_ = m;
+            space_ = new Vector[n_];
+
+            for (int i = 0; i < n_; i++) {
+                space_[i] = Vector(n);
+            }
+        }
+        ~Span() {
+            delete[] space_;
+            space_ = nullptr;
+        }
+
+        Span& operator=(const Span &other) {
+            if (this == &other) return *this;
+
+            const auto old_n_ = n_;
+            n_ = other.n_;
+            if (old_n_ != n_) {
+                delete[] space_;
+                space_ = new Vector[n_];
+            }
+
+            dim_ = other.dim_;
+            dim_changed = other.dim_changed;
+
+            for (int i = 0; i < n_; i++) space_[i] = other[i];
+            return *this;
+        }
 
 
-        Vector operator[](int p) { // NOLINT
-            if (n_ == 0) return *space_;
+        VectorProxy operator[](int p) { // NOLINT
+            if (n_ == 0) return {*space_, dim_changed};
             if (p >= n_) {
                 std::cout << "\n";
                 std::stringstream err("Index out of range:\n");
                 err << "Requested index: " << p << ", but size of Span is: " << n_ << "\n";
                 throw std::out_of_range(err.str());
             }
-            return space_[p];
+            return {space_[p], dim_changed};
         }
         Vector operator[](const int p) const {
             if (n_ == 0) return *space_;
@@ -89,7 +146,7 @@ namespace Objects {
         }
 
 
-        Span swap(const int p1, const int p2) {
+        Span& swap(const int p1, const int p2) {
             if (n_ == 0) return *this;
             if (p1 >= n_ || p2 >= n_) {
                 std::cout << "\n";
@@ -109,6 +166,12 @@ namespace Objects {
         [[nodiscard]] int dim() const { return dim_; }
         [[nodiscard]] int room() const { return space_[0].size(); }
         [[nodiscard]] int size() const { return n_; }
+
+
+        [[nodiscard]] Vector* begin() const { return space_; }
+        [[nodiscard]] Vector* end() const { return space_ + n_; }
+        [[nodiscard]] Vector* begin() { return space_; }
+        [[nodiscard]] Vector* end() { return space_ + n_; }
     };
 } // Objects
 
