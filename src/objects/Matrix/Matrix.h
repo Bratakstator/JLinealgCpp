@@ -23,6 +23,11 @@ namespace Objects {
         double operator[](int m, int n) const;
         Matrix operator*(const Matrix &other);
 
+        int get_non_zero_row_in_col(int col, int current_row);
+
+        Matrix row_echelon();
+        Matrix reduced_row_echelon();
+
         [[nodiscard]] bool identity();
         [[nodiscard]] bool identity() const;
 
