@@ -32,7 +32,29 @@ namespace Objects {
 
     DoubleProxy& DoubleProxy::operator+=(const double val) {
         if (isNullPtr_) return *this;
+
         element_ += val;
+        changed_ = true;
+        dim_changed_ = true;
+
+        return *this;
+    }
+
+    DoubleProxy& DoubleProxy::operator-=(double val) {
+        if (isNullPtr_) return *this;
+
+        element_ -= val;
+        changed_ = true;
+        dim_changed_ = true;
+
+        return *this;
+    }
+
+    DoubleProxy& DoubleProxy::operator/=(const double val) {
+        if (val == 0) throw std::invalid_argument("Can not divide by zero");
+        if (isNullPtr_) return *this;
+
+        element_ /= val;
         changed_ = true;
         dim_changed_ = true;
 

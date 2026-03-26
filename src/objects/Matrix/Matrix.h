@@ -13,6 +13,8 @@ namespace Objects {
 
         int identity_ = 1; // -1: not calculated, 0: false, 1: true
 
+        int swap_rows(int r1, int r2);
+
     public:
         Matrix();
         explicit Matrix(const Span &span);
@@ -25,7 +27,7 @@ namespace Objects {
 
         int get_non_zero_row_in_col(int col, int current_row);
 
-        Matrix row_echelon();
+        Matrix row_echelon(bool pivots_must_be_one=false);
         Matrix reduced_row_echelon();
 
         [[nodiscard]] bool identity();

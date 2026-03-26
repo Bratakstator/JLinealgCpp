@@ -36,6 +36,8 @@ namespace Objects {
         DoubleProxy& operator=(double val);
         DoubleProxy& operator=(const DoubleProxy &other);
         DoubleProxy& operator+=(double val);
+        DoubleProxy& operator-=(double val);
+        DoubleProxy& operator/=(double val);
     };
 
     class Vector {
