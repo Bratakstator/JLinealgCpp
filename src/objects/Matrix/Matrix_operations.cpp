@@ -7,7 +7,7 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    int Matrix::swap_rows(int r1, int r2) {
+    int Matrix::swap_rows(const int r1, const int r2) {
         if (!(r1 == -1 || r2 == -1 || r1 == r2)) return 1;
         span_.swap(r1, r2);
         return 0;
@@ -15,7 +15,14 @@ namespace Objects {
 
     int Matrix::get_non_zero_row_in_col(const int col, const int current_row) {
         for (int row = current_row; row < rows(); row++) {
-            if ((*this)[row, col] != 0) return (*this)[row, col];
+            if ((*this)[row, col] != 0) return row;
+        }
+        return -1;
+    }
+
+    int Matrix::get_first_non_zero_col(const int row) {
+        for (int col = 0; col < columns(); col++) {
+            if ((*this)[row, col] != 0) return col;
         }
         return -1;
     }
@@ -48,6 +55,24 @@ namespace Objects {
                     else ech[row, col] -= factor * ech[pivot, col];
                 }
                 if (pivot_val == 0) return ech;
+            }
+        }
+
+        return ech;
+    }
+
+    Matrix Matrix::reduced_row_echelon() {
+        Matrix ech = row_echelon(true);
+
+        for (int pivot = ech.rows() - 1; pivot >= 0; pivot--) {
+            const int pivot_col = get_first_non_zero_col(pivot);
+            if (pivot_col == -1) continue;
+
+            for (int row = pivot - 1; row >= 0; row--) {
+                double factor = ech[row, pivot_col];
+                for (int col = pivot_col; col >= 0; col--) {
+                    ech[row, col] -= factor * ech[pivot, col];
+                }
             }
         }
 

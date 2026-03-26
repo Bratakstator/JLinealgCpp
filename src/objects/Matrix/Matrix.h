@@ -26,6 +26,7 @@ namespace Objects {
         Matrix operator*(const Matrix &other);
 
         int get_non_zero_row_in_col(int col, int current_row);
+        int get_first_non_zero_col(int row);
 
         Matrix row_echelon(bool pivots_must_be_one=false);
         Matrix reduced_row_echelon();
