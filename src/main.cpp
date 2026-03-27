@@ -14,11 +14,16 @@ int main() {
          {2, 6, 3}}
     );
 
-    Matrix B = A * A;
+    // Matrix B = A * A;
 
-    std::cout << B[0, 0] << "\t" << B[0, 1] << "\t" << B[0, 2] << "\n";
-    std::cout << B[1, 0] << "\t" << B[1, 1] << "\t" << B[1, 2] << "\n";
-    std::cout << B[2, 0] << "\t" << B[2, 1] << "\t" << B[2, 2] << "\n";
+    A.print();
+    std::cout << "\n";
+    A.row_echelon().print();
+    std::cout << "\n";
+    A.reduced_row_echelon().print();
+    std::cout << "\n";
+
+    std::cout << "det(A) = " <<  A.determinant() << "\n";
 
     return 0;
 }
