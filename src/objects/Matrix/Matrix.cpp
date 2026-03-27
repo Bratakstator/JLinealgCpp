@@ -3,6 +3,9 @@
 //
 
 #include "Matrix.h"
+
+#include <iomanip>
+
 #include "../Span/Span.h"
 #include "../Vector/Vector.h"
 
@@ -29,6 +32,20 @@ namespace Objects {
     Matrix::Matrix(const Matrix &other) {
         identity_ = other.identity_;
         span_ = other.span_;
+    }
+
+
+    double Matrix::determinant() {
+        if (rows() != columns()) return 0;
+        if (determinant_calculated) return determinant_;
+        if (!echelons_.REF_calculated || echelons_.REF_with_pivots_eq_one) row_echelon();
+
+        Matrix ech(echelons_.REF);
+        determinant_ = 1;
+        for (int p = 0; p < rows(); p++) determinant_ *= ech[p, p];
+        determinant_calculated = true;
+
+        return determinant_;
     }
 
 
@@ -66,4 +83,16 @@ namespace Objects {
 
     [[nodiscard]] int Matrix::rows() const { return span_.size(); }
     [[nodiscard]] int Matrix::columns() const { return span_.room(); }
+
+
+    void Matrix::print() const {
+        std::cout << std::fixed << std::setprecision(2);
+
+        for (int row = 0; row < rows(); row++) {
+            for (int col = 0; col < columns(); col++) {
+                std::cout << (*this)[row, col] << "  ";
+            }
+            std::cout << "\n";
+        }
+    }
 } // Objects
