@@ -15,7 +15,7 @@ namespace Objects {
     }
 
     Matrix Matrix::operator*(const Matrix &other) {
-        if (identity() && other.identity()) return {};
+        if (identity() && other.identity()) return *this;
         if (identity()) return {other};
         if (other.identity()) return {*this};
 

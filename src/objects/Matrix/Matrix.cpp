@@ -11,9 +11,18 @@
 
 namespace Objects {
 
-    Matrix::Matrix() {
+    Matrix::Matrix(const int n) {
+        span_ = Span(n, n);
+
+        for (int p = 0; p < rows(); p++) span_[p][p] = 1;
         identity_ = 1;
         diagonal_ = 1;
+        determinant_ = 1;
+        determinant_calculated = true;
+    }
+
+    Matrix::Matrix(const int m, const int n) {
+        span_ = Span(m, n);
     }
 
     Matrix::Matrix(const Span &span) {

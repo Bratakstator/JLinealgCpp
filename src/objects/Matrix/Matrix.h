@@ -30,7 +30,10 @@ namespace Objects {
         int swap_rows(int r1, int r2);
 
     public:
-        Matrix();
+        Matrix() = delete;
+
+        explicit Matrix(int n);
+        Matrix(int m, int n);
         explicit Matrix(const Span &span);
         explicit Matrix(std::initializer_list<Vector> span);
         Matrix(const Matrix &other);
