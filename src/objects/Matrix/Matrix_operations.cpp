@@ -27,7 +27,8 @@ namespace Objects {
         return -1;
     }
 
-    Matrix Matrix::row_echelon(bool pivots_must_be_one) {
+    Matrix Matrix::row_echelon(const bool pivots_must_be_one) {
+        if (echelons_.REF_calculated && echelons_.REF_with_pivots_eq_one == pivots_must_be_one) return Matrix(echelons_.REF);
         Matrix ech(span_);
 
         for (int pivot = 0; pivot < ech.rows(); pivot++) {
@@ -36,11 +37,11 @@ namespace Objects {
             for (int row = pivot; row < ech.rows(); row++) {
                 double pivot_val = ech[pivot, pivot_col];
                 double factor = ech[row, pivot_col];
-                if (pivot_val == 0) factor /= pivot_val;
+                if (pivot_val != 0) factor /= pivot_val;
 
                 for (int col = pivot_col; col < ech.columns(); col++) {
                     if (pivot_val == 0 && ech[pivot, col] == 0) {
-                        if (ech.swap_rows(pivot, get_non_zero_row_in_col(col, pivot)) == 0) {
+                        if (ech.swap_rows(pivot, ech.get_non_zero_row_in_col(col, pivot)) == 0) {
                             pivot_col = col;
                             pivot_val = ech[pivot, pivot_col];
                         }
@@ -52,30 +53,36 @@ namespace Objects {
                     }
 
                     if (row == pivot && pivots_must_be_one) ech[row, col] /= pivot_val;
-                    else ech[row, col] -= factor * ech[pivot, col];
+                    else if (row != pivot) ech[row, col] -= factor * ech[pivot, col];
                 }
-                if (pivot_val == 0) return ech;
+                if (pivot_val == 0) pivot = ech.rows();
             }
         }
 
+        echelons_.REF_calculated = true;
+        echelons_.REF_with_pivots_eq_one = pivots_must_be_one;
+        echelons_.REF = ech.span_;
         return ech;
     }
 
     Matrix Matrix::reduced_row_echelon() {
+        if (echelons_.RREF_calculated) return Matrix(echelons_.RREF);
         Matrix ech = row_echelon(true);
 
         for (int pivot = ech.rows() - 1; pivot >= 0; pivot--) {
-            const int pivot_col = get_first_non_zero_col(pivot);
+            const int pivot_col = ech.get_first_non_zero_col(pivot);
             if (pivot_col == -1) continue;
 
             for (int row = pivot - 1; row >= 0; row--) {
                 double factor = ech[row, pivot_col];
-                for (int col = pivot_col; col >= 0; col--) {
+                for (int col = pivot_col; col < ech.columns(); col++) {
                     ech[row, col] -= factor * ech[pivot, col];
                 }
             }
         }
 
+        echelons_.RREF_calculated = true;
+        echelons_.RREF = ech.span_;
         return ech;
     }
 }
