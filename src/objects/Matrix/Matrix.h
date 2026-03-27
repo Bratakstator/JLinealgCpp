@@ -8,10 +8,22 @@
 #include "../Span/Span.h"
 
 namespace Objects {
+    struct Echelons {
+        Span REF;
+        Span RREF;
+
+        bool REF_calculated = false;
+        bool REF_with_pivots_eq_one = false;
+        bool RREF_calculated = false;
+    };
+
     class Matrix {
         Span span_;
+        Echelons echelons_;
 
         int identity_ = 1; // -1: not calculated, 0: false, 1: true
+        double determinant_ = 0;
+        bool determinant_calculated = false;
 
         int swap_rows(int r1, int r2);
 
@@ -31,11 +43,15 @@ namespace Objects {
         Matrix row_echelon(bool pivots_must_be_one=false);
         Matrix reduced_row_echelon();
 
+        [[nodiscard]] double determinant(); // NOLINT
+
         [[nodiscard]] bool identity();
         [[nodiscard]] bool identity() const;
 
         [[nodiscard]] int rows() const;
         [[nodiscard]] int columns() const;
+
+        void print() const;
     };
 } // Objects
 
