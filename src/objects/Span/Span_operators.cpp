@@ -17,32 +17,32 @@ namespace Objects {
             space_ = new Vector[n_];
         }
 
-        dim_ = other.dim_;
-        dim_changed = other.dim_changed;
+        rank_ = other.rank_;
+        changed_ = other.changed_;
 
-        for (int i = 0; i < n_; i++) space_[i] = other[i];
+        for (size_t i = 0; i < n_; i++) space_[i] = other[i];
         return *this;
     }
 
 
-    VectorProxy Span::operator[](int p) { // NOLINT
-        if (n_ == 0) return {*space_, dim_changed};
-        if (p >= n_) {
+    VectorProxy Span::operator[](size_t i) { // NOLINT
+        if (n_ == 0) return {*space_, changed_};
+        if (i >= n_) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << p << ", but size of Span is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but size of Span is: " << n_ << "\n";
             throw std::out_of_range(err.str());
         }
-        return {space_[p], dim_changed};
+        return {space_[i], changed_};
     }
-    Vector Span::operator[](const int p) const {
+    Vector Span::operator[](const size_t i) const {
         if (n_ == 0) return *space_;
-        if (p >= n_) {
+        if (i >= n_) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << p << ", but the size of Span is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but the size of Span is: " << n_ << "\n";
             throw std::out_of_range(err.str());
         }
-        return space_[p];
+        return space_[i];
     }
 } // Objects

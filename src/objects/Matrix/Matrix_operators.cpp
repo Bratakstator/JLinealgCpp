@@ -7,11 +7,11 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    DoubleProxy Matrix::operator[](const int m, const int n) {
-        return span_[m][n];
+    ComponentProxy Matrix::operator[](const size_t m, const size_t n) {
+        return row_space_[m][n];
     }
-    double Matrix::operator[](const int m, const int n) const {
-        return span_[m][n];
+    double Matrix::operator[](const size_t m, const size_t n) const {
+        return row_space_[m][n];
     }
 
     Matrix Matrix::operator*(const Matrix &other) {
@@ -26,9 +26,9 @@ namespace Objects {
         }
 
         Matrix C(Span(rows(), other.columns()));
-        for (int m = 0; m < rows(); m++) {
-            for (int n = 0; n < other.columns(); n++) {
-                for (int cxr = 0; cxr < columns(); cxr++) {
+        for (size_t m = 0; m < rows(); m++) {
+            for (size_t n = 0; n < other.columns(); n++) {
+                for (size_t cxr = 0; cxr < columns(); cxr++) {
                     C[m, n] += (*this)[m, cxr] * other[cxr, n];
                 }
             }

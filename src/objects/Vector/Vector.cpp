@@ -7,24 +7,24 @@
 #include "Vector.h"
 
 namespace Objects {
-    Vector::Vector() { elements_ = new double[1]; }
+    Vector::Vector() { components_ = new component_t[1]; }
 
-    Vector::Vector(const std::initializer_list<double> elements) {
-        n_ = elements.size();
+    Vector::Vector(const std::initializer_list<component_t> components) {
+        n_ = components.size();
         if (n_ == 0) return;
 
-        elements_ = new double[n_];
+        components_ = new component_t[n_];
 
-        int i = 0;
-        for (const auto element : elements) {
-            elements_[i] = element;
+        size_t i = 0;
+        for (const auto component : components) {
+            components_[i] = component;
             i++;
         }
 
         if (norm() == 0) {
             n_ = 0;
-            delete elements_;
-            elements_ = new double[1];
+            delete components_;
+            components_ = new component_t[1];
             changed_ = true;
         }
         else isNullPtr = false;
@@ -36,32 +36,32 @@ namespace Objects {
         changed_ = other.changed_;
         isNullPtr = other.isNullPtr;
 
-        elements_ = new double[n_];
-        for (int i = 0; i < n_; i++) {
-            elements_[i] = other[i];
+        components_ = new component_t[n_];
+        for (size_t i = 0; i < n_; i++) {
+            components_[i] = other[i];
         }
     }
 
-    Vector::Vector(const int n) {
+    Vector::Vector(const size_t n) {
         n_ = n;
-        elements_ = new double[n_];
+        components_ = new component_t[n_];
         isNullPtr = false;
 
-        for (int i = 0; i < n_; i++) {
-            elements_[i] = 0;
+        for (size_t i = 0; i < n_; i++) {
+            components_[i] = 0;
         }
     }
 
     Vector::~Vector() {
-        delete[] elements_;
-        elements_ = nullptr;
+        delete[] components_;
+        components_ = nullptr;
     }
 
-    double Vector::norm() { // NOLINT
+    norm_t Vector::norm() { // NOLINT
         if (!changed_) return norm_;
 
-        double sum = 0;
-        for (int i = 0; i < n_; i++) sum += elements_[i] * elements_[i];
+        norm_t sum = 0;
+        for (size_t i = 0; i < n_; i++) sum += components_[i] * components_[i];
         norm_ = std::sqrt(sum);
         changed_ = false;
 
@@ -69,6 +69,6 @@ namespace Objects {
     }
 
 
-    [[nodiscard]] int Vector::size() const { return n_; }
+    [[nodiscard]] dim_t Vector::dimension() const { return n_; }
     [[nodiscard]] bool Vector::is_null_vec() const { return isNullPtr; }
 } // Objects

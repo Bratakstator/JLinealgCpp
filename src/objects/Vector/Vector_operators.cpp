@@ -14,71 +14,71 @@ namespace Objects {
         changed_ = other.changed_;
         isNullPtr = other.isNullPtr;
 
-        elements_ = new double[n_];
+        components_ = new component_t[n_];
 
-        for (int i = 0; i < n_; i++) {
-            elements_[i] = other.elements_[i];
+        for (size_t i = 0; i < n_; i++) {
+            components_[i] = other.components_[i];
         }
         return *this;
     }
 
 
-    DoubleProxy Vector::operator[](int p) { // NOLINT
-        if (n_ == 0) return {*elements_, changed_, isNullPtr};
-        if (p >= n_) {
+    ComponentProxy Vector::operator[](size_t i) { // NOLINT
+        if (n_ == 0) return {*components_, changed_, isNullPtr};
+        if (i >= n_) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << p << ", but size of Vector is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but size of Vector is: " << n_ << "\n";
             throw std::out_of_range(err.str());
         }
-        return {elements_[p], changed_, isNullPtr};
+        return {components_[i], changed_, isNullPtr};
     }
-    double Vector::operator[](const int p) const {
+    double Vector::operator[](const size_t i) const {
         if (n_ == 0) return 0;
-        if (p >= n_) {
+        if (i >= n_) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << p << ", but size of Vector is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but size of Vector is: " << n_ << "\n";
             throw std::out_of_range(err.str());
         }
-        return elements_[p];
+        return components_[i];
     }
 
     Vector& Vector::operator+=(const Vector &other) {
-        if (isNullPtr && !other.is_null_vec()) {
-            n_ = other.size();
-            delete[] elements_;
-            elements_ = new double[n_];
+        if (isNullPtr && !other.isNullPtr) {
+            n_ = other.n_;
+            delete[] components_;
+            components_ = new component_t[n_];
 
-            for (int i = 0; i < n_; i++) elements_[i] = other[i];
+            for (size_t i = 0; i < n_; i++) components_[i] = other[i];
             isNullPtr = false;
             changed_ = true;
 
             return *this;
         }
-        if (other.is_null_vec()) return *this;
+        if (other.isNullPtr) return *this;
 
-        for (int i = 0; i < n_; i++) elements_[i] += other[i];
+        for (size_t i = 0; i < n_; i++) components_[i] += other[i];
         changed_ = true;
 
         return *this;
     }
 
     Vector& Vector::operator-=(const Vector &other) {
-        if (isNullPtr && !other.is_null_vec()) {
-            n_ = other.size();
-            delete[] elements_;
-            elements_ = new double[n_];
+        if (isNullPtr && !other.isNullPtr) {
+            n_ = other.n_;
+            delete[] components_;
+            components_ = new component_t[n_];
 
-            for (int i = 0; i < n_; i++) elements_[i] = -other[i];
+            for (size_t i = 0; i < n_; i++) components_[i] = -other[i];
             isNullPtr = false;
             changed_ = true;
 
             return *this;
         }
-        if (other.is_null_vec()) return *this;
+        if (other.isNullPtr) return *this;
 
-        for (int i = 0; i < n_; i++) elements_[i] -= other[i];
+        for (size_t i = 0; i < n_; i++) components_[i] -= other[i];
         changed_ = true;
 
         return *this;
@@ -86,9 +86,9 @@ namespace Objects {
 
     bool Vector::operator==(Vector &other) {
         if (!(isNullPtr && other.is_null_vec())) return false;
-        if (n_ != other.size()) return false;
+        if (n_ != other.dimension()) return false;
         if (norm() != other.norm()) return false;
-        for (int i = 0; i < n_; i++) if (elements_[i] != other[i]) return false;
+        for (size_t i = 0; i < n_; i++) if (components_[i] != other[i]) return false;
         return true;
     }
 

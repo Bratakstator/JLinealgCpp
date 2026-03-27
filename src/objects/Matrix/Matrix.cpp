@@ -10,31 +10,30 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
+    Matrix::Matrix(const size_t n) {
+        row_space_ = Span(n, n);
 
-    Matrix::Matrix(const int n) {
-        span_ = Span(n, n);
-
-        for (int p = 0; p < rows(); p++) span_[p][p] = 1;
+        for (size_t p = 0; p < rows(); p++) row_space_[p][p] = 1;
         identity_ = 1;
         diagonal_ = 1;
         determinant_ = 1;
         determinant_calculated = true;
     }
 
-    Matrix::Matrix(const int m, const int n) {
-        span_ = Span(m, n);
+    Matrix::Matrix(const size_t m, const size_t n) {
+        row_space_ = Span(m, n);
     }
 
-    Matrix::Matrix(const Span &span) {
-        span_ = span;
+    Matrix::Matrix(const Span &row_space) {
+        row_space_ = row_space;
     }
 
-    Matrix::Matrix(const std::initializer_list<Vector> span) {
-        span_ = Span(span);
+    Matrix::Matrix(const std::initializer_list<Vector> row_space) {
+        row_space_ = Span(row_space);
     }
 
     Matrix::Matrix(const Matrix &other) {
-        span_ = other.span_;
+        row_space_ = other.row_space_;
         echelons_ = other.echelons_;
 
         identity_ = other.identity_;
@@ -44,12 +43,12 @@ namespace Objects {
     }
 
 
-    double Matrix::determinant() {
+    det_t Matrix::determinant() {
         if (rows() != columns()) return 0;
         if (determinant_calculated) return determinant_;
         if (diagonal_ == 1) {
             determinant_ = 1;
-            for (int p = 0; p < rows(); p++) determinant_ *= (*this)[p, p];
+            for (size_t p = 0; p < rows(); p++) determinant_ *= (*this)[p, p];
             determinant_calculated = true;
             return determinant_;
         }
@@ -57,7 +56,7 @@ namespace Objects {
 
         Matrix ech(echelons_.REF);
         determinant_ = 1;
-        for (int p = 0; p < rows(); p++) determinant_ *= ech[p, p];
+        for (size_t p = 0; p < rows(); p++) determinant_ *= ech[p, p];
         determinant_calculated = true;
 
         return determinant_;
@@ -66,13 +65,13 @@ namespace Objects {
 
     [[nodiscard]] bool Matrix::identity() {
         if (identity_ != -1) return identity_;
-        if (span_.size() != span_.room()) identity_ = 0;
+        if (row_space_.rank() != row_space_.vector_dimension()) identity_ = 0;
         else {
             identity_ = 1;
-            for (int m = 0; m < span_.size(); m++) {
-                for (int n = 0; n < span_.room(); n++) {
-                    const double val = (*this)[m, n]; // NOLINT
-                    if ((m == n && val != 1) || val != 0) {
+            for (size_t m = 0; m < row_space_.size(); m++) {
+                for (size_t n = 0; n < row_space_.vector_dimension(); n++) {
+                    const component_t component = (*this)[m, n]; // NOLINT
+                    if ((m == n && component != 1) || component != 0) {
                         identity_ = 0;
                         break;
                     }
@@ -84,27 +83,27 @@ namespace Objects {
     }
     [[nodiscard]] bool Matrix::identity() const {
         if (identity_ != -1) return identity_;
-        if (span_.size() != span_.room()) return false;
+        if (row_space_.rank() != row_space_.vector_dimension()) return false;
 
-        for (int m = 0; m < span_.size(); m++) {
-            for (int n = 0; n < span_.room(); n++) {
-                const double val = (*this)[m, n]; // NOLINT
-                if ((m == n && val != 1) || val != 0) return false;
+        for (size_t m = 0; m < row_space_.size(); m++) {
+            for (size_t n = 0; n < row_space_.vector_dimension(); n++) {
+                const component_t component = (*this)[m, n]; // NOLINT
+                if ((m == n && component != 1) || component != 0) return false;
             }
         }
         return true;
     }
 
 
-    [[nodiscard]] int Matrix::rows() const { return span_.size(); }
-    [[nodiscard]] int Matrix::columns() const { return span_.room(); }
+    [[nodiscard]] size_t Matrix::rows() const { return row_space_.size(); }
+    [[nodiscard]] size_t Matrix::columns() const { return row_space_.vector_dimension(); }
 
 
     void Matrix::print() const {
         std::cout << std::fixed << std::setprecision(2);
 
-        for (int row = 0; row < rows(); row++) {
-            for (int col = 0; col < columns(); col++) {
+        for (size_t row = 0; row < rows(); row++) {
+            for (size_t col = 0; col < columns(); col++) {
                 std::cout << (*this)[row, col] << "  ";
             }
             std::cout << "\n";

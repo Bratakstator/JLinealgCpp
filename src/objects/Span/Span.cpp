@@ -13,7 +13,7 @@ namespace Objects {
         n_ = space.size();
         space_ = new Vector[n_];
 
-        int i = 0;
+        size_t i = 0;
         for (const auto& Vec : space) {
             space_[i] = Vec;
             i++;
@@ -24,21 +24,21 @@ namespace Objects {
     Span::Span(const Span &other) {
         n_ = other.size();
         space_ = new Vector[n_];
-        dim_ = other.dim_;
-        dim_changed = other.dim_changed;
+        rank_ = other.rank_;
+        changed_ = other.changed_;
 
-        int i = 0;
-        for (auto &vector : other) {
+        size_t i = 0;
+        for (const auto &vector : other) {
             space_[i] = vector;
             i++;
         }
     }
 
-    Span::Span(const int m, const int n) {
+    Span::Span(const size_t m, const size_t n) {
         n_ = m;
         space_ = new Vector[n_];
 
-        for (int i = 0; i < n_; i++) {
+        for (size_t i = 0; i < n_; i++) {
             space_[i] = Vector(n);
         }
     }
@@ -55,12 +55,12 @@ namespace Objects {
     }
 
     void Span::set_dim() {
-        dim_ = 0;
+        rank_ = 0;
         Span copy(*this);
     }
 
 
-    Span& Span::swap(const int p1, const int p2) {
+    Span& Span::swap(const size_t p1, const size_t p2) {
         if (n_ == 0) return *this;
         if (p1 >= n_ || p2 >= n_) {
             std::cout << "\n";
@@ -77,9 +77,9 @@ namespace Objects {
     }
 
 
-    [[nodiscard]] int Span::dim() const { return dim_; }
-    [[nodiscard]] int Span::room() const { return space_[0].size(); }
-    [[nodiscard]] int Span::size() const { return n_; }
+    [[nodiscard]] dim_t Span::rank() const { return rank_; }
+    [[nodiscard]] dim_t Span::vector_dimension() const { return space_[0].dimension(); }
+    [[nodiscard]] size_t Span::size() const { return n_; }
 
 
     [[nodiscard]] Vector* Span::begin() const { return space_; }

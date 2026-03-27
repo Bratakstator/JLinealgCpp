@@ -18,25 +18,25 @@
 namespace Objects {
     class VectorProxy {
         Vector &vector_;
-        bool &dim_changed_;
+        bool &changed_;
 
     public:
-        VectorProxy(Vector &vector, bool &dim_changed)
-            : vector_(vector), dim_changed_(dim_changed)
+        VectorProxy(Vector &vector, bool &changed)
+            : vector_(vector), changed_(changed)
         {}
 
         operator Vector(); // NOLINT
         VectorProxy& operator=(const Vector &other);
         VectorProxy& operator=(const VectorProxy &other);
-        DoubleProxy operator[](int p);
-        double operator[](int p) const;
+        ComponentProxy operator[](size_t i);
+        component_t operator[](size_t i) const;
     };
 
     class Span {
         Vector *space_ = nullptr;
-        int n_ = 0;
-        int dim_ = 0;
-        bool dim_changed = true;
+        size_t n_ = 0;
+        dim_t rank_ = 0;
+        bool changed_ = true;
 
         int any_row_with_non_zero_in_col(int r_, int c_);
         void set_dim();
@@ -45,18 +45,18 @@ namespace Objects {
         Span();
         explicit Span(std::initializer_list<Vector> space);
         explicit Span(const Span &other);
-        explicit Span(int m, int n);
+        explicit Span(size_t m, size_t n);
         ~Span();
 
         Span& operator=(const Span &other);
-        VectorProxy operator[](int p);
-        Vector operator[](int p) const;
+        VectorProxy operator[](size_t i);
+        Vector operator[](size_t i) const;
 
-        Span& swap(int p1, int p2);
+        Span& swap(size_t p1, size_t p2);
 
-        [[nodiscard]] int dim() const;
-        [[nodiscard]] int room() const;
-        [[nodiscard]] int size() const;
+        [[nodiscard]] dim_t rank() const;
+        [[nodiscard]] dim_t vector_dimension() const;
+        [[nodiscard]] size_t size() const;
 
         [[nodiscard]] Vector* begin() const;
         [[nodiscard]] Vector* end() const;

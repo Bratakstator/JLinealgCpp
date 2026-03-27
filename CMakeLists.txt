@@ -13,4 +13,5 @@ add_executable(JLinealgCpp src/main.cpp
         src/objects/Vector/DoubleProxy.cpp
         src/objects/Span/VectorProxy.cpp
         src/objects/Matrix/Matrix_operations.cpp
+        src/Tools/VectorTools.h
 )

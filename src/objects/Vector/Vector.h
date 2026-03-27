@@ -5,10 +5,7 @@
 #ifndef JLINEALGCPP_VECTOR_H
 #define JLINEALGCPP_VECTOR_H
 
-#include <cmath>
 #include <sstream>
-
-#include "../Matrix/Matrix.h"
 
 //  ________________
 // {| a1 | a2 | a3 |
@@ -17,34 +14,39 @@
 //  ----------------
 
 namespace Objects {
-    class DoubleProxy {
-        double &element_;
-        bool &changed_;
-        bool &dim_changed_;
+    using component_t = double;
+    using norm_t = double;
+    using size_t = std::initializer_list<component_t>::size_type;
+    using dim_t = size_t;
+
+    class ComponentProxy {
+        component_t &component_;
+        bool &vec_changed_;
+        bool &span_changed_;
         bool &isNullPtr_;
 
     public:
         friend class VectorProxy;
-        DoubleProxy(double &element, bool &changed, bool &isNullPtr)
-            : element_(element), changed_(changed), dim_changed_(changed), isNullPtr_(isNullPtr)
+        ComponentProxy(component_t &component, bool &changed, bool &isNullPtr)
+            : component_(component), vec_changed_(changed), span_changed_(changed), isNullPtr_(isNullPtr)
         {}
-        DoubleProxy(double &element, bool &changed, bool &dim_changed, bool &isNullPtr)
-            : element_(element), changed_(changed), dim_changed_(dim_changed), isNullPtr_(isNullPtr)
+        ComponentProxy(component_t &component, bool &vec_changed, bool &span_changed, bool &isNullPtr)
+            : component_(component), vec_changed_(vec_changed), span_changed_(span_changed), isNullPtr_(isNullPtr)
         {}
 
-        operator double(); // NOLINT
-        DoubleProxy& operator=(double val);
-        DoubleProxy& operator=(const DoubleProxy &other);
-        DoubleProxy& operator+=(double val);
-        DoubleProxy& operator-=(double val);
-        DoubleProxy& operator/=(double val);
+        operator component_t(); // NOLINT
+        ComponentProxy& operator=(component_t component);
+        ComponentProxy& operator=(const ComponentProxy &component);
+        ComponentProxy& operator+=(component_t component);
+        ComponentProxy& operator-=(component_t component);
+        ComponentProxy& operator/=(component_t component);
     };
 
     class Vector {
-        double *elements_ = nullptr;
-        int n_ = 0;
+        component_t *components_ = nullptr;
+        dim_t n_ = 0;
 
-        double norm_ = 0;
+        norm_t norm_ = 0;
 
         bool changed_ = true;
         bool isNullPtr = true;
@@ -60,22 +62,22 @@ namespace Objects {
          * Constructs vector from initializer list.\n
          * If newly constructed vector is found to have a norm of 0: resets to null vector.
          */
-        Vector(std::initializer_list<double> elements);
+        Vector(std::initializer_list<component_t> components);
         Vector(const Vector &other);
-        explicit Vector(int n);
+        explicit Vector(dim_t n);
         ~Vector();
 
         Vector& operator=(const Vector &other);
-        DoubleProxy operator[](int p);
-        double operator[](int p) const;
+        ComponentProxy operator[](size_t i);
+        component_t operator[](size_t i) const;
         Vector& operator+=(const Vector &other);
         Vector& operator-=(const Vector &other);
         bool operator==(Vector &other);
         bool operator!=(Vector &other);
 
-        double norm();
+        norm_t norm();
 
-        [[nodiscard]] int size() const;
+        [[nodiscard]] dim_t dimension() const;
         [[nodiscard]] bool is_null_vec() const;
     };
 

@@ -7,56 +7,56 @@
 #include "Vector.h"
 
 namespace Objects {
-    DoubleProxy::operator double() { // NOLINT
-        return element_;
+    ComponentProxy::operator component_t() { // NOLINT
+        return component_;
     }
 
-    DoubleProxy& DoubleProxy::operator=(const double val) {
+    ComponentProxy& ComponentProxy::operator=(const component_t component) {
         if (isNullPtr_) return *this;
 
-        element_ = val;
-        changed_ = true;
-        dim_changed_ = true;
+        component_ = component;
+        vec_changed_ = true;
+        span_changed_ = true;
         return *this;
     }
-    DoubleProxy& DoubleProxy::operator=(const DoubleProxy &other) {
+    ComponentProxy& ComponentProxy::operator=(const ComponentProxy &component) {
         if (isNullPtr_) return *this;
 
-        if (this != &other) {
-            element_ = other.element_;
-            changed_ = true;
-            dim_changed_ = true;
+        if (this != &component) {
+            component_ = component.component_;
+            vec_changed_ = true;
+            span_changed_ = true;
         }
         return *this;
     }
 
-    DoubleProxy& DoubleProxy::operator+=(const double val) {
+    ComponentProxy& ComponentProxy::operator+=(const component_t component) {
         if (isNullPtr_) return *this;
 
-        element_ += val;
-        changed_ = true;
-        dim_changed_ = true;
+        component_ += component;
+        vec_changed_ = true;
+        span_changed_ = true;
 
         return *this;
     }
 
-    DoubleProxy& DoubleProxy::operator-=(double val) {
+    ComponentProxy& ComponentProxy::operator-=(const component_t component) {
         if (isNullPtr_) return *this;
 
-        element_ -= val;
-        changed_ = true;
-        dim_changed_ = true;
+        component_ -= component;
+        vec_changed_ = true;
+        span_changed_ = true;
 
         return *this;
     }
 
-    DoubleProxy& DoubleProxy::operator/=(const double val) {
-        if (val == 0) throw std::invalid_argument("Can not divide by zero");
+    ComponentProxy& ComponentProxy::operator/=(const component_t component) {
+        if (component == 0) throw std::invalid_argument("Can not divide by zero");
         if (isNullPtr_) return *this;
 
-        element_ /= val;
-        changed_ = true;
-        dim_changed_ = true;
+        component_ /= component;
+        vec_changed_ = true;
+        span_changed_ = true;
 
         return *this;
     }

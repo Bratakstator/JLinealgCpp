@@ -8,6 +8,8 @@
 #include "../Span/Span.h"
 
 namespace Objects {
+    using det_t = component_t;
+
     struct Echelons {
         Span REF;
         Span RREF;
@@ -18,13 +20,13 @@ namespace Objects {
     };
 
     class Matrix {
-        Span span_;
+        Span row_space_;
         Echelons echelons_;
 
         int identity_ = -1; // -1: not calculated, 0: false, 1: true
         int diagonal_ = -1;
 
-        double determinant_ = 0;
+        det_t determinant_ = 0;
         bool determinant_calculated = false;
 
         int swap_rows(int r1, int r2);
@@ -32,14 +34,14 @@ namespace Objects {
     public:
         Matrix() = delete;
 
-        explicit Matrix(int n);
-        Matrix(int m, int n);
-        explicit Matrix(const Span &span);
-        explicit Matrix(std::initializer_list<Vector> span);
+        explicit Matrix(size_t n);
+        Matrix(size_t m, size_t n);
+        explicit Matrix(const Span &row_space);
+        explicit Matrix(std::initializer_list<Vector> row_space);
         Matrix(const Matrix &other);
 
-        DoubleProxy operator[](int m, int n); // NOLINT
-        double operator[](int m, int n) const;
+        ComponentProxy operator[](size_t m, size_t n); // NOLINT
+        component_t operator[](size_t m, size_t n) const;
         Matrix operator*(const Matrix &other);
 
         int get_non_zero_row_in_col(int col, int current_row);
@@ -48,14 +50,14 @@ namespace Objects {
         Matrix row_echelon(bool pivots_must_be_one=false);
         Matrix reduced_row_echelon();
 
-        [[nodiscard]] double determinant(); // NOLINT
+        [[nodiscard]] det_t determinant(); // NOLINT
 
         [[nodiscard]] bool diagonal();
         [[nodiscard]] bool identity();
         [[nodiscard]] bool identity() const;
 
-        [[nodiscard]] int rows() const;
-        [[nodiscard]] int columns() const;
+        [[nodiscard]] size_t rows() const;
+        [[nodiscard]] size_t columns() const;
 
         void print() const;
     };

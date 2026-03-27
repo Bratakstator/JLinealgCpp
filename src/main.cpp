@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "logging/Logger.h"
 #include "objects/Matrix/Matrix.h"
 #include "objects/Vector/Vector.h"
@@ -24,6 +26,10 @@ int main() {
     std::cout << "\n";
 
     std::cout << "det(A) = " <<  A.determinant() << "\n";
+
+    std::vector<int> a = {1, 2, 3};
+
+    a.size()
 
     return 0;
 }
