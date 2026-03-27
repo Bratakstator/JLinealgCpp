@@ -12,32 +12,38 @@
 namespace Objects {
 
     Matrix::Matrix() {
-        span_ = Span({
-            {1, 0, 0},
-            {0, 1, 0},
-            {0, 0, 1}
-        });
+        identity_ = 1;
+        diagonal_ = 1;
     }
 
     Matrix::Matrix(const Span &span) {
-        identity_ = -1;
         span_ = span;
     }
 
     Matrix::Matrix(const std::initializer_list<Vector> span) {
-        identity_ = -1;
         span_ = Span(span);
     }
 
     Matrix::Matrix(const Matrix &other) {
-        identity_ = other.identity_;
         span_ = other.span_;
+        echelons_ = other.echelons_;
+
+        identity_ = other.identity_;
+        diagonal_ = other.diagonal_;
+        determinant_ = other.determinant_;
+        determinant_calculated = other.determinant_calculated;
     }
 
 
     double Matrix::determinant() {
         if (rows() != columns()) return 0;
         if (determinant_calculated) return determinant_;
+        if (diagonal_ == 1) {
+            determinant_ = 1;
+            for (int p = 0; p < rows(); p++) determinant_ *= (*this)[p, p];
+            determinant_calculated = true;
+            return determinant_;
+        }
         if (!echelons_.REF_calculated || echelons_.REF_with_pivots_eq_one) row_echelon();
 
         Matrix ech(echelons_.REF);

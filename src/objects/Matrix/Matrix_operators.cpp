@@ -7,7 +7,7 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    DoubleProxy Matrix::operator[](int m, int n) {
+    DoubleProxy Matrix::operator[](const int m, const int n) {
         return span_[m][n];
     }
     double Matrix::operator[](const int m, const int n) const {

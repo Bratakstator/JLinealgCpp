@@ -21,7 +21,9 @@ namespace Objects {
         Span span_;
         Echelons echelons_;
 
-        int identity_ = 1; // -1: not calculated, 0: false, 1: true
+        int identity_ = -1; // -1: not calculated, 0: false, 1: true
+        int diagonal_ = -1;
+
         double determinant_ = 0;
         bool determinant_calculated = false;
 
@@ -45,6 +47,7 @@ namespace Objects {
 
         [[nodiscard]] double determinant(); // NOLINT
 
+        [[nodiscard]] bool diagonal();
         [[nodiscard]] bool identity();
         [[nodiscard]] bool identity() const;
 
