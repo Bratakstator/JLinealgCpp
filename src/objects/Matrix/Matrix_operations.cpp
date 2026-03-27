@@ -7,24 +7,24 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    int Matrix::swap_rows(const int r1, const int r2) {
-        if (!(r1 == -1 || r2 == -1 || r1 == r2)) return 1;
+    code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) {
+        if (r1 != r2 && code != -1) return 1;
         row_space_.swap(r1, r2);
         return 0;
     }
 
-    int Matrix::get_non_zero_row_in_col(const int col, const int current_row) {
-        for (int row = current_row; row < rows(); row++) {
-            if ((*this)[row, col] != 0) return row;
+    Code Matrix::get_non_zero_row_in_col(const size_t col, const size_t current_row) {
+        for (size_t row = current_row; row < rows(); row++) {
+            if ((*this)[row, col] != 0) return {row, 0};
         }
-        return -1;
+        return {current_row, -1};
     }
 
-    int Matrix::get_first_non_zero_col(const int row) {
-        for (int col = 0; col < columns(); col++) {
-            if ((*this)[row, col] != 0) return col;
+    Code Matrix::get_first_non_zero_col(const size_t row) {
+        for (size_t col = 0; col < columns(); col++) {
+            if ((*this)[row, col] != 0) return {col, 0};
         }
-        return -1;
+        return {0, -1};
     }
 
     Matrix Matrix::row_echelon(const bool pivots_must_be_one) {
@@ -45,7 +45,8 @@ namespace Objects {
 
                     for (size_t col = pivot_col; col < ech.columns(); col++) {
                         if (pivot_val == 0 && ech[pivot, col] == 0) {
-                            if (ech.swap_rows(pivot, ech.get_non_zero_row_in_col(col, pivot)) == 0) {
+                            auto [index, code] = ech.get_non_zero_row_in_col(col, pivot);
+                            if (ech.swap_rows(pivot, index, code) == 0) {
                                 pivot_col = col;
                                 pivot_val = ech[pivot, pivot_col];
                             }
@@ -77,13 +78,14 @@ namespace Objects {
 
         if (diagonal_ != 1) {
             for (size_t pivot_complement = 0; pivot_complement < ech.rows(); pivot_complement++) {
-                auto pivot = (ech.rows() - 1) - pivot_complement;
-                auto pivot_col = ech.get_first_non_zero_col(pivot);
-                if (pivot_col == -1) continue;
+                const auto pivot = (ech.rows() - 1) - pivot_complement;
+                auto [pivot_col, code] = ech.get_first_non_zero_col(pivot);
+                if (code == -1) continue;
 
                 for (size_t row_complement = 0; row_complement < pivot; row_complement++) {
-                    auto row = (pivot - 1) - row_complement;
-                    component_t factor = ech[row, pivot_col];
+                    const auto row = (pivot - 1) - row_complement;
+                    const component_t factor = ech[row, pivot_col];
+
                     for (size_t col = pivot_col; col < ech.columns(); col++) {
                         ech[row, col] -= factor * ech[pivot, col];
                     }

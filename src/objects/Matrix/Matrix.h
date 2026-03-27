@@ -9,6 +9,12 @@
 
 namespace Objects {
     using det_t = component_t;
+    using code_t = int;
+
+    struct Code {
+        size_t index;
+        code_t code;
+    };
 
     struct Echelons {
         Span REF;
@@ -29,7 +35,7 @@ namespace Objects {
         det_t determinant_ = 0;
         bool determinant_calculated = false;
 
-        int swap_rows(int r1, int r2);
+        code_t swap_rows(size_t r1, size_t r2, code_t code=0);
 
     public:
         Matrix() = delete;
@@ -44,8 +50,8 @@ namespace Objects {
         component_t operator[](size_t m, size_t n) const;
         Matrix operator*(const Matrix &other);
 
-        int get_non_zero_row_in_col(int col, int current_row);
-        int get_first_non_zero_col(int row);
+        Code get_non_zero_row_in_col(size_t col, size_t current_row);
+        Code get_first_non_zero_col(size_t row);
 
         Matrix row_echelon(bool pivots_must_be_one=false);
         Matrix reduced_row_echelon();
