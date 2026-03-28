@@ -12,6 +12,10 @@ namespace Objects {
         if (r1 == r2) return 1;
 
         row_space_.swap(r1, r2);
+        determinant_calculated = false;
+        echelons_.REF_valid = false;
+        echelons_.REF_with_pivots_eq_one = false;
+
         return 0;
     }
 
