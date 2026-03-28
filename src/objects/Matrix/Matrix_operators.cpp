@@ -36,4 +36,18 @@ namespace Objects {
 
         return C;
     }
+
+    Vector Matrix::get_column(const size_t n) const {
+        if (n >= columns()) throw std::out_of_range("Column index out of range");
+
+        Vector v(rows());
+        for (size_t row = 0; row < rows(); row++) v[row] = (*this)[row, n];
+        return v;
+    }
+
+    Vector Matrix::get_row(const size_t m) const {
+        if (m >= rows()) throw std::out_of_range("Row index out of range");
+
+        return row_space_[m];
+    }
 } // Objects

@@ -114,6 +114,9 @@ namespace Objects {
         component_t operator[](size_t m, size_t n) const;
         Matrix operator*(const Matrix &other);
 
+        Vector get_column(size_t n) const;
+        Vector get_row(size_t m) const;
+
         /**
          * @brief Gets the first instance of a non-zero row-element in given column, starting at current_row.
          */
