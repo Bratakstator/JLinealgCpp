@@ -16,6 +16,11 @@
 //  ----------------
 
 namespace Objects {
+    /**
+     * @brief Acts as a proxy for the vector.
+     *
+     * This allows the tracking of changes to the vector outside the Span's own methods.
+     */
     class VectorProxy {
         Vector &vector_;
         bool &changed_;
@@ -32,6 +37,9 @@ namespace Objects {
         component_t operator[](size_t i) const;
     };
 
+    /**
+     * @brief Is a container of vectors representing the span of a vector space.
+     */
     class Span {
         Vector *space_ = nullptr;
         size_t n_ = 0;
@@ -42,9 +50,21 @@ namespace Objects {
         void set_dim();
 
     public:
+        /**
+         * Creates a span of size 0 containing only a null vector.
+         */
         Span();
+        /**
+         * Creates a span from initializer list.
+         */
         explicit Span(std::initializer_list<Vector> space);
+        /**
+         * Makes a copy of another span.
+         */
         explicit Span(const Span &other);
+        /**
+         * Creates a span of specified size.
+         */
         explicit Span(size_t m, size_t n);
         ~Span();
 
@@ -52,10 +72,23 @@ namespace Objects {
         VectorProxy operator[](size_t i);
         Vector operator[](size_t i) const;
 
+        /**
+         * Swaps the place of two vectors.\n
+         * Returns itself.
+         */
         Span& swap(size_t p1, size_t p2);
 
+        /**
+         * Returns the rank of the span.
+         */
         [[nodiscard]] dim_t rank() const;
+        /**
+         * Returns the dimension the vectorspace belongs to.
+         */
         [[nodiscard]] dim_t vector_dimension() const;
+        /**
+         * Returns the amount of vectors in the span (regardless of dependence).
+         */
         [[nodiscard]] size_t size() const;
 
         [[nodiscard]] Vector* begin() const;
