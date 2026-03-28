@@ -26,10 +26,10 @@ namespace Objects {
         }
 
         Matrix C(Span(rows(), other.columns()));
-        for (size_t m = 0; m < rows(); m++) {
-            for (size_t n = 0; n < other.columns(); n++) {
+        for (size_t row = 0; row < rows(); row++) {
+            for (size_t col = 0; col < other.columns(); col++) {
                 for (size_t cxr = 0; cxr < columns(); cxr++) {
-                    C[m, n] += (*this)[m, cxr] * other[cxr, n];
+                    C[row, col] += (*this)[row, cxr] * other[cxr, col];
                 }
             }
         }
