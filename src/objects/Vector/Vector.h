@@ -19,6 +19,11 @@ namespace Objects {
     using size_t = std::initializer_list<component_t>::size_type;
     using dim_t = size_t;
 
+    /**
+     * @brief Used as a proxy for the vector components.
+     *
+     * This allows the tracking of when vector components are transformed outside the vector's own methods.
+     */
     class ComponentProxy {
         component_t &component_;
         bool &vec_changed_;
