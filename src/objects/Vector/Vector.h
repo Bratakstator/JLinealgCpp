@@ -86,6 +86,9 @@ namespace Objects {
         explicit Vector(dim_t n);
         ~Vector();
 
+        /**
+         * Turns the vector into a copy of another.
+         */
         Vector& operator=(const Vector &other);
         ComponentProxy operator[](size_t i);
         component_t operator[](size_t i) const;
@@ -94,9 +97,19 @@ namespace Objects {
         bool operator==(Vector &other);
         bool operator!=(Vector &other);
 
+        /**
+         * Returns the norm (length) of the vector.
+         */
         norm_t norm();
 
+        /**
+         * @brief Returns the dimension the vector belongs to.\n
+         * As an example, a vector with 3 components is an element of R<sup>3</sup> space.
+         */
         [[nodiscard]] dim_t dimension() const;
+        /**
+         * Returns true if the vector is a null vector.
+         */
         [[nodiscard]] bool is_null_vec() const;
     };
 
