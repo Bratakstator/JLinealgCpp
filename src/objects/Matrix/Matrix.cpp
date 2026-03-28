@@ -51,7 +51,7 @@ namespace Objects {
             determinant_calculated = true;
             return determinant_;
         }
-        if (!echelons_.REF_calculated || echelons_.REF_with_pivots_eq_one) row_echelon();
+        if (!echelons_.REF_valid || echelons_.REF_with_pivots_eq_one) row_echelon();
 
         Matrix ech(echelons_.REF);
         determinant_ = 1;

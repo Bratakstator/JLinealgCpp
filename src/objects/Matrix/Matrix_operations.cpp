@@ -8,7 +8,9 @@
 
 namespace Objects {
     code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) {
-        if (r1 != r2 && code != -1) return 1;
+        if (code != 0) return 128 + code;
+        if (r1 == r2) return 1;
+
         row_space_.swap(r1, r2);
         return 0;
     }
@@ -28,7 +30,7 @@ namespace Objects {
     }
 
     Matrix Matrix::row_echelon(const bool pivots_must_be_one) {
-        if (echelons_.REF_calculated && echelons_.REF_with_pivots_eq_one == pivots_must_be_one) return Matrix(echelons_.REF);
+        if (echelons_.REF_valid && echelons_.REF_with_pivots_eq_one == pivots_must_be_one) return Matrix(echelons_.REF);
         if (identity_ == 1) return *this;
         Matrix ech(row_space_);
         if (diagonal_ == 1 && pivots_must_be_one) {
@@ -65,14 +67,14 @@ namespace Objects {
             }
         }
 
-        echelons_.REF_calculated = true;
+        echelons_.REF_valid = true;
         echelons_.REF_with_pivots_eq_one = pivots_must_be_one;
         echelons_.REF = ech.row_space_;
         return ech;
     }
 
     Matrix Matrix::reduced_row_echelon() {
-        if (echelons_.RREF_calculated) return Matrix(echelons_.RREF);
+        if (echelons_.RREF_valid) return Matrix(echelons_.RREF);
         if (identity_ == 1) return *this;
         Matrix ech = row_echelon(true);
 
@@ -93,7 +95,7 @@ namespace Objects {
             }
         }
 
-        echelons_.RREF_calculated = true;
+        echelons_.RREF_valid = true;
         echelons_.RREF = ech.row_space_;
         return ech;
     }
