@@ -44,6 +44,14 @@ namespace Objects {
         Span REF;
         Span RREF;
 
+        void reset(const bool REF_B=true, const bool RREF_B=true) {
+            if (REF_B) {
+                REF_valid = false;
+                REF_with_pivots_eq_one = false;
+            }
+            if (RREF_B) RREF_valid = false;
+        }
+
         bool REF_valid = false;
         bool REF_with_pivots_eq_one = false;
         bool RREF_valid = false;
@@ -150,6 +158,7 @@ namespace Objects {
 
         [[nodiscard]] size_t rows() const;
         [[nodiscard]] size_t columns() const;
+        [[nodiscard]] size_t rank() const;
 
         void print() const;
     };

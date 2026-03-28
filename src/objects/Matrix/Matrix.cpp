@@ -62,15 +62,15 @@ namespace Objects {
     }
 
 
-    [[nodiscard]] bool Matrix::identity() {
+    bool Matrix::identity() {
         if (identity_ != -1) return identity_;
-        if (row_space_.rank() != row_space_.vector_dimension()) identity_ = 0;
+        if (rank() != columns()) identity_ = 0;
         else {
             identity_ = 1;
-            for (size_t m = 0; m < row_space_.size(); m++) {
-                for (size_t n = 0; n < row_space_.vector_dimension(); n++) {
-                    const component_t component = (*this)[m, n]; // NOLINT
-                    if ((m == n && component != 1) || component != 0) {
+            for (size_t row = 0; row < rows(); row++) {
+                for (size_t col = 0; col < columns(); col++) {
+                    const component_t component = (*this)[row, col]; // NOLINT
+                    if ((row == col && component != 1) || component != 0) {
                         identity_ = 0;
                         break;
                     }
@@ -80,22 +80,23 @@ namespace Objects {
         }
         return identity_;
     }
-    [[nodiscard]] bool Matrix::identity() const {
+    bool Matrix::identity() const {
         if (identity_ != -1) return identity_;
-        if (row_space_.rank() != row_space_.vector_dimension()) return false;
+        if (rank() != columns()) return false;
 
-        for (size_t m = 0; m < row_space_.size(); m++) {
-            for (size_t n = 0; n < row_space_.vector_dimension(); n++) {
-                const component_t component = (*this)[m, n]; // NOLINT
-                if ((m == n && component != 1) || component != 0) return false;
+        for (size_t row = 0; row < rows(); row++) {
+            for (size_t col = 0; col < columns(); col++) {
+                const component_t component = (*this)[row, col]; // NOLINT
+                if ((row == col && component != 1) || component != 0) return false;
             }
         }
         return true;
     }
 
 
-    [[nodiscard]] size_t Matrix::rows() const { return row_space_.size(); }
-    [[nodiscard]] size_t Matrix::columns() const { return row_space_.vector_dimension(); }
+    size_t Matrix::rows() const { return row_space_.size(); }
+    size_t Matrix::columns() const { return row_space_.vector_dimension(); }
+    size_t Matrix::rank() const { return row_space_.rank(); }
 
 
     void Matrix::print() const {
