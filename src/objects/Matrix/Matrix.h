@@ -139,6 +139,11 @@ namespace Objects {
         Matrix reduced_row_echelon();
 
         /**
+         * @brief Returns the transposed matrix.
+         */
+        Matrix transpose();
+
+        /**
          * @brief Returns the determinant of the matrix.
          */
         [[nodiscard]] det_t determinant(); // NOLINT

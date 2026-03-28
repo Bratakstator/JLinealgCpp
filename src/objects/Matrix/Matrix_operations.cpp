@@ -103,4 +103,16 @@ namespace Objects {
         echelons_.RREF = ech.row_space_;
         return ech;
     }
+
+    Matrix Matrix::transpose() {
+        Matrix T(columns(), rows());
+
+        for (int row = 0; row < T.rows(); row++) {
+            for (int col = 0; col < T.columns(); col++) {
+                T[row, col] = (*this)[col, row];
+            }
+        }
+
+        return T;
+    }
 }
