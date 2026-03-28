@@ -42,6 +42,20 @@ namespace Objects {
         ComponentProxy& operator/=(component_t component);
     };
 
+    /**
+     * @brief A class holding components (values) in a (usually) fixed-sized container.
+     *
+     * The default constructor initializes the vector as a purely logical entity (subject to change/be removed).
+     * As a logical entity, the vector is no longer bound by the size of the container. The array will be initialized
+     * as an array of size 1, where the operator[] will return 0, or a proxy of 0, regardless of index. This makes it
+     * compatible with any other vector regardless of size.
+     *
+     * operator+= and operator-= will turn the vector from a logical entity, to an actual container object. Here the
+     * vector will take the form of the other vector, but only if the other vector is the right operand.
+     *
+     * When the vector is an actual container object, the only way of resizing it is by assigning it another vector.\n
+     * As a container object it will act like a mathematical vector, rather than purely a container of elements.
+     */
     class Vector {
         component_t *components_ = nullptr;
         dim_t n_ = 0;
@@ -59,11 +73,16 @@ namespace Objects {
          */
         Vector();
         /**
-         * Constructs vector from initializer list.\n
-         * If newly constructed vector is found to have a norm of 0: resets to null vector.
+         * Constructs vector from initializer list.
          */
         Vector(std::initializer_list<component_t> components);
+        /**
+         * Constructs a vector from another vector.
+         */
         Vector(const Vector &other);
+        /**
+         * Creates an empty vector of fixed size.
+         */
         explicit Vector(dim_t n);
         ~Vector();
 
