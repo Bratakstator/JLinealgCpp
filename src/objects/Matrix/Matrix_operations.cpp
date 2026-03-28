@@ -11,7 +11,7 @@ namespace Objects {
         if (code != 0) return 128 + code;
         if (r1 == r2) return 1;
 
-        // row_space_.swap(r1, r2); Does nothing for now, will fix after done with matrix class
+        row_space_.swap(r1, r2);
 
         if (cache_.det_calculated) cache_.det *= (-1);
         cache_.REF_valid = false;

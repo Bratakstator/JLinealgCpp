@@ -125,7 +125,7 @@ namespace Objects {
      * Does not contain default constructor, must be made either with a list of vectors or with an explicit size.
      */
     class Matrix {
-        Span row_space_;
+        mutable Span row_space_;
         mutable MatrixCache cache_;
 
         /**
