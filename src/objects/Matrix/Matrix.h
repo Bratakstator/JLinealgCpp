@@ -21,40 +21,102 @@ namespace Objects {
         code_t code;
     };
 
-    /**
-     * @brief Struct containing the echelon forms of a matrix.
-     *
-     * The struct also comes with these flags:
-     * - REF_valid
-     * - RREF_valid
-     * - REF_with_pivots_eq_one
-     *
-     * These flags must be changed if the matrix itself is changed (except for row operations), this as they are used
-     * to indicate the validity of the echelon forms, which they will not be unless the transformation of the matrix
-     * remains row equivalent.
-     *
-     * @param REF is the row echelon form, an upper-triangular matrix.
-     * @param RREF is the reduced row echelon form where each pivot element will be the only non-zero element in column.\n
-     * @param REF_valid should indicate whether the REF is valid or not.
-     * @param RREF_valid should indicate whether the RREF is valid or not.
-     * @param REF_with_pivots_eq_one should indicate if REF was formed by turning each pivot to one, this so
-     * the determinant-method won't use it to calculate the determinant.
-     */
-    struct Echelons {
-        Span REF;
-        Span RREF;
+    struct EigenPairs {
+        mutable Vector values;
+        mutable Span vectors;
+    };
 
-        void reset(const bool REF_B=true, const bool RREF_B=true) {
-            if (REF_B) {
-                REF_valid = false;
-                REF_with_pivots_eq_one = false;
-            }
-            if (RREF_B) RREF_valid = false;
+    struct PLU {
+        mutable Span P;
+        mutable Span L;
+        mutable Span U;
+    };
+
+    struct QR {
+        mutable Span Q;
+        mutable Span R;
+    };
+
+    struct SmallCache {
+        mutable bool is = false;
+        mutable bool valid = false;
+
+        SmallCache& operator=(const bool b) {
+            is = b;
+            valid = b;
+            return *this;
         }
 
-        bool REF_valid = false;
-        bool REF_with_pivots_eq_one = false;
-        bool RREF_valid = false;
+        operator bool() const { return is && valid; } // NOLINT
+    };
+
+    struct MatrixCache {
+        mutable SmallCache identity;
+        mutable SmallCache diagonal;
+        mutable SmallCache symmetrical;
+        mutable SmallCache skew_symmetrical;
+
+        mutable SmallCache invertible;
+
+        mutable SmallCache upper_triangular;
+        mutable SmallCache lower_triangular;
+
+        mutable SmallCache orthonormal_columns;
+        mutable SmallCache orthogonal;
+
+        mutable det_t det = 0;
+        mutable bool det_calculated = false;
+
+        mutable bool REF_valid = false;
+        mutable bool REF_with_pivots_force_eq_one = false;
+        mutable Span REF;
+
+        mutable bool RREF_valid = false;
+        mutable Span RREF;
+
+        mutable bool PLU_valid = false;
+        mutable PLU plu;
+
+        mutable bool QR_valid = false;
+        mutable QR qr;
+
+        mutable bool inverse_valid = false;
+        mutable Span inverse;
+
+        mutable bool eigen_valid = false;
+        mutable EigenPairs eigen;
+
+        void invertible_true() { // NOLINT
+            identity = true;
+            diagonal = true;
+            symmetrical = true;
+
+            invertible = true;
+
+            upper_triangular = true;
+            lower_triangular = true;
+
+            orthonormal_columns = true;
+            orthogonal = true;
+
+            det = 1;
+            det_calculated = true;
+        }
+        void invertible_false() { // NOLINT
+            identity = false;
+            diagonal = false;
+            symmetrical = false;
+
+            invertible = false;
+
+            upper_triangular = false;
+            lower_triangular = false;
+
+            orthonormal_columns = false;
+            orthogonal = false;
+
+            det_calculated = false;
+        }
     };
 
     /**
@@ -64,13 +126,7 @@ namespace Objects {
      */
     class Matrix {
         Span row_space_;
-        Echelons echelons_;
-
-        int identity_ = -1; // -1: not calculated, 0: false, 1: true
-        int diagonal_ = -1;
-
-        det_t determinant_ = 0;
-        bool determinant_calculated = false;
+        mutable MatrixCache cache_;
 
         /**
          * @brief Swaps rows in the matrix.
@@ -84,7 +140,7 @@ namespace Objects {
          * <code> code_t code = swap_rows(2, 4, 15); // returns 128 + 15 = 143 </code>\n
          * <code> code_t code_actual = code - 128; // code_actual = 143 - 128 = 15 </code>
          */
-        code_t swap_rows(size_t r1, size_t r2, code_t code=0);
+        code_t swap_rows(size_t r1, size_t r2, code_t code=0) const;
 
     public:
         Matrix() = delete;
@@ -114,17 +170,17 @@ namespace Objects {
         component_t operator[](size_t m, size_t n) const;
         Matrix operator*(const Matrix &other);
 
-        Vector get_column(size_t n) const;
-        Vector get_row(size_t m) const;
+        [[nodiscard]] Vector get_column(size_t n) const;
+        [[nodiscard]] Vector get_row(size_t m) const;
 
         /**
          * @brief Gets the first instance of a non-zero row-element in given column, starting at current_row.
          */
-        Code get_non_zero_row_in_col(size_t col, size_t current_row);
+        Code get_non_zero_row_in_col(size_t col, size_t current_row) const;
         /**
          * @brief Gets the first non-zero column-element in a given row.
          */
-        Code get_first_non_zero_col(size_t row);
+        Code get_first_non_zero_col(size_t row) const;
 
         /**
          * @brief Reduces a copy of the matrix to row echelon form.
@@ -133,32 +189,28 @@ namespace Objects {
          * The parameter 'pivots_must_be_one' tells the method whether it should turn all pivot-elements to 1 (true),
          * or only turn elements below pivots to 0.
          */
-        Matrix row_echelon(bool pivots_must_be_one=false);
+        Matrix row_echelon(bool pivots_must_be_one=false) const;
         /**
          * @brief Reduces a copy of the matrix to reduced row echelon form.
          *
          * The reduced copy will be stored in this matrix's echelons struct in echelons_.RREF and returned.
          */
-        Matrix reduced_row_echelon();
+        Matrix reduced_row_echelon() const;
 
         /**
          * @brief Returns the transposed matrix.
          */
-        Matrix transpose();
+        Matrix transpose() const;
 
         /**
          * @brief Returns the determinant of the matrix.
          */
-        [[nodiscard]] det_t determinant(); // NOLINT
+        [[nodiscard]] det_t determinant() const; // NOLINT
 
         /**
          * @brief Returns whether this matrix is a diagonal matrix.
          */
-        [[nodiscard]] bool diagonal();
-        /**
-         * Returns whether this matrix is an identity matrix.
-         */
-        [[nodiscard]] bool identity();
+        [[nodiscard]] bool diagonal() const;
         /**
          * Returns whether this matrix is an identity matrix.
          */

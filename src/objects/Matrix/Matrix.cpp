@@ -13,10 +13,7 @@ namespace Objects {
         row_space_ = Span(n, n);
 
         for (size_t p = 0; p < rows(); p++) row_space_[p][p] = 1;
-        identity_ = 1;
-        diagonal_ = 1;
-        determinant_ = 1;
-        determinant_calculated = true;
+        cache_.invertible_true();
     }
 
     Matrix::Matrix(const size_t m, const size_t n) {
@@ -33,64 +30,47 @@ namespace Objects {
 
     Matrix::Matrix(const Matrix &other) {
         row_space_ = other.row_space_;
-        echelons_ = other.echelons_;
-
-        identity_ = other.identity_;
-        diagonal_ = other.diagonal_;
-        determinant_ = other.determinant_;
-        determinant_calculated = other.determinant_calculated;
+        cache_ = other.cache_;
     }
 
 
-    det_t Matrix::determinant() {
+    det_t Matrix::determinant() const {
         if (rows() != columns()) return 0;
-        if (determinant_calculated) return determinant_;
-        if (diagonal_ == 1) {
-            determinant_ = 1;
-            for (size_t p = 0; p < rows(); p++) determinant_ *= (*this)[p, p];
-            determinant_calculated = true;
-            return determinant_;
-        }
-        if (!echelons_.REF_valid || echelons_.REF_with_pivots_eq_one) row_echelon();
+        if (cache_.det_calculated) return cache_.det;
 
-        Matrix ech(echelons_.REF);
-        determinant_ = 1;
-        for (size_t p = 0; p < rows(); p++) determinant_ *= ech[p, p];
-        determinant_calculated = true;
+        Matrix A(1);
+        if (cache_.diagonal) A = *this;
+        else if (!cache_.REF_valid || cache_.REF_with_pivots_force_eq_one) A = row_echelon();
+        else A = Matrix(cache_.REF);
 
-        return determinant_;
+        det_t det = 1;
+        for (size_t pivot = 0; pivot < rows(); pivot++) det *= A[pivot, pivot];
+        cache_.det = det;
+        cache_.det_calculated = true;
+
+        return cache_.det;
     }
 
 
-    bool Matrix::identity() {
-        if (identity_ != -1) return identity_;
-        if (rank() != columns()) identity_ = 0;
+    bool Matrix::identity() const {
+        if (cache_.identity.valid) return cache_.identity.is;
+        if (rank() != columns()) {
+            cache_.identity.is = false;
+            cache_.identity.valid = true;
+        }
+        else if (cache_.diagonal.valid) {
+            cache_.identity = true;
+            for (size_t pivot = 0; pivot < rows(); pivot++) if ((*this)[pivot, pivot] != 1) cache_.identity.is = false;
+        }
         else {
-            identity_ = 1;
+            cache_.identity = true;
             for (size_t row = 0; row < rows(); row++) {
                 for (size_t col = 0; col < columns(); col++) {
-                    const component_t component = (*this)[row, col]; // NOLINT
-                    if ((row == col && component != 1) || component != 0) {
-                        identity_ = 0;
-                        break;
-                    }
+                    if ((row == col && (*this)[row, col] != 1) || (*this)[row, col] != 0) cache_.identity.is = false;
                 }
-                if (identity_ == 0) break;
             }
         }
-        return identity_;
-    }
-    bool Matrix::identity() const {
-        if (identity_ != -1) return identity_;
-        if (rank() != columns()) return false;
-
-        for (size_t row = 0; row < rows(); row++) {
-            for (size_t col = 0; col < columns(); col++) {
-                const component_t component = (*this)[row, col]; // NOLINT
-                if ((row == col && component != 1) || component != 0) return false;
-            }
-        }
-        return true;
+        return cache_.identity.is;
     }
 
 
