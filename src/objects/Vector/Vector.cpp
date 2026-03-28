@@ -2,12 +2,17 @@
 // Created by Joakim on 22.03.2026.
 //
 
+#include <cmath>
+
 #include "../Matrix/Matrix.h"
 #include "../Span/Span.h"
 #include "Vector.h"
 
 namespace Objects {
-    Vector::Vector() { components_ = new component_t[1]; }
+    Vector::Vector() {
+        components_ = new component_t[1];
+        components_[0] = 0;
+    }
 
     Vector::Vector(const std::initializer_list<component_t> components) {
         n_ = components.size();

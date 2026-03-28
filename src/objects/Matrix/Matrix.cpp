@@ -2,10 +2,9 @@
 // Created by Joakim on 22.03.2026.
 //
 
-#include "Matrix.h"
-
 #include <iomanip>
 
+#include "Matrix.h"
 #include "../Span/Span.h"
 #include "../Vector/Vector.h"
 
