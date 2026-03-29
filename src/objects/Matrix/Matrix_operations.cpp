@@ -13,9 +13,9 @@ namespace Objects {
 
         row_space_.swap(r1, r2);
 
-        if (cache_.det_calculated) cache_.det *= (-1);
-        cache_.REF_valid = false;
-        cache_.RREF_valid = false;
+        if (cache_.det.valid) cache_.det.is *= (-1);
+        cache_.REF.valid = false;
+        cache_.RREF.valid = false;
 
         return 0;
     }
@@ -35,11 +35,12 @@ namespace Objects {
     }
 
     Matrix Matrix::row_echelon(const bool pivots_must_be_one) const {
-        if (cache_.REF_valid && cache_.REF_with_pivots_force_eq_one == pivots_must_be_one) return Matrix(cache_.REF);
-        if (cache_.identity) return *this;
+        if (auto [i, v] = cache_.REF_force_eq_one;
+            cache_.REF.valid && ((i && v) == pivots_must_be_one)) return Matrix(cache_.REF.is);
+        if (cache_.identity.is && cache_.identity.valid) return *this;
 
         Matrix ech(row_space_);
-        if (cache_.diagonal && pivots_must_be_one) {
+        if (auto [is, valid] = cache_.diagonal; (is && valid) && pivots_must_be_one) {
             for (size_t p = 0; p < ech.rows(); p++) ech[p, p] = 1;
         }
         else {
@@ -73,18 +74,18 @@ namespace Objects {
             }
         }
 
-        cache_.REF_valid = true;
-        cache_.REF_with_pivots_force_eq_one = pivots_must_be_one;
-        cache_.REF = ech.row_space_;
+        cache_.REF.valid = true;
+        cache_.REF_force_eq_one.is = cache_.REF_force_eq_one.valid = pivots_must_be_one;
+        cache_.REF.is = ech.row_space_;
         return ech;
     }
 
     Matrix Matrix::reduced_row_echelon() const {
-        if (cache_.RREF_valid) return Matrix(cache_.RREF);
-        if (cache_.identity) return *this;
+        if (cache_.RREF.valid) return Matrix(cache_.RREF.is);
+        if (auto [is, valid] = cache_.identity; is && valid) return *this;
 
         Matrix ech = row_echelon(true);
-        if (!cache_.diagonal) {
+        if (auto [is, valid] = cache_.diagonal; !(is && valid)) {
             for (size_t pivot_complement = 0; pivot_complement < ech.rows(); pivot_complement++) {
                 const auto pivot = (ech.rows() - 1) - pivot_complement;
                 auto [pivot_col, code] = ech.get_first_non_zero_col(pivot);
@@ -101,8 +102,8 @@ namespace Objects {
             }
         }
 
-        cache_.RREF_valid = true;
-        cache_.RREF = ech.row_space_;
+        cache_.RREF.valid = true;
+        cache_.RREF.is = ech.row_space_;
         return ech;
     }
 

@@ -9,14 +9,11 @@
 namespace Objects {
     Vector& Vector::operator=(const Vector &other) {
         if (this == &other) return *this;
-        n_ = other.n_;
-        norm_ = other.norm_;
-        changed_ = other.changed_;
-        isNullPtr = other.isNullPtr;
+        cache_ = other.cache_;
 
-        components_ = new component_t[n_];
+        components_ = new component_t[cache_.n.is];
 
-        for (size_t i = 0; i < n_; i++) {
+        for (size_t i = 0; i < cache_.n.is; i++) {
             components_[i] = other.components_[i];
         }
         return *this;
@@ -24,71 +21,69 @@ namespace Objects {
 
 
     ComponentProxy Vector::operator[](size_t i) { // NOLINT
-        if (n_ == 0) return {*components_, changed_, isNullPtr};
-        if (i >= n_) {
+        if (cache_.n.is == 0) return {*components_, cache_};
+        if (i >= cache_.n.is) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << i << ", but size of Vector is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but size of Vector is: " << cache_.n.is << "\n";
             throw std::out_of_range(err.str());
         }
-        return {components_[i], changed_, isNullPtr};
+        return {components_[i], cache_};
     }
     double Vector::operator[](const size_t i) const {
-        if (n_ == 0) return 0;
-        if (i >= n_) {
+        if (cache_.n.is == 0) return 0;
+        if (i >= cache_.n.is) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested index: " << i << ", but size of Vector is: " << n_ << "\n";
+            err << "Requested index: " << i << ", but size of Vector is: " << cache_.n.is << "\n";
             throw std::out_of_range(err.str());
         }
         return components_[i];
     }
 
     Vector& Vector::operator+=(const Vector &other) {
-        if (isNullPtr && !other.isNullPtr) {
-            n_ = other.n_;
+        if (is_null_vec() && !other.is_null_vec()) {
+            cache_.n = other.cache_.n;
             delete[] components_;
-            components_ = new component_t[n_];
+            components_ = new component_t[cache_.n.is];
 
-            for (size_t i = 0; i < n_; i++) components_[i] = other[i];
-            isNullPtr = false;
-            changed_ = true;
+            for (size_t i = 0; i < cache_.n.is; i++) components_[i] = other[i];
+            cache_.norm.valid = false;
 
             return *this;
         }
-        if (other.isNullPtr) return *this;
+        if (other.is_null_vec()) return *this;
 
-        for (size_t i = 0; i < n_; i++) components_[i] += other[i];
-        changed_ = true;
+        for (size_t i = 0; i < cache_.n.is; i++) components_[i] += other[i];
+        cache_.norm.valid = false;
 
         return *this;
     }
 
     Vector& Vector::operator-=(const Vector &other) {
-        if (isNullPtr && !other.isNullPtr) {
-            n_ = other.n_;
+        if (is_null_vec() && !other.is_null_vec()) {
+            cache_.n = other.cache_.n;
             delete[] components_;
-            components_ = new component_t[n_];
+            components_ = new component_t[cache_.n.is];
 
-            for (size_t i = 0; i < n_; i++) components_[i] = -other[i];
-            isNullPtr = false;
-            changed_ = true;
+            for (size_t i = 0; i < cache_.n.is; i++) components_[i] = -other[i];
+            cache_.norm.valid = false;
 
             return *this;
         }
-        if (other.isNullPtr) return *this;
+        if (other.is_null_vec()) return *this;
 
-        for (size_t i = 0; i < n_; i++) components_[i] -= other[i];
-        changed_ = true;
+        for (size_t i = 0; i < cache_.n.is; i++) components_[i] -= other[i];
+        cache_.norm.valid = false;
 
         return *this;
     }
 
     bool Vector::operator==(Vector &other) {
-        if (!(isNullPtr && other.is_null_vec())) return false;
-        if (n_ != other.dimension()) return false;
+        if (!(is_null_vec() && other.is_null_vec())) return false;
+        if (cache_.n.is != other.dimension()) return false;
         if (norm() != other.norm()) return false;
-        for (size_t i = 0; i < n_; i++) if (components_[i] != other[i]) return false;
+        for (size_t i = 0; i < cache_.n.is; i++) if (components_[i] != other[i]) return false;
         return true;
     }
 

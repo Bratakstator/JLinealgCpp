@@ -7,11 +7,16 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    Span::Span() { space_ = new Vector[1]; }
+    Span::Span() {
+        space_ = new Vector[1];
+
+        cache_.count = {0, true};
+        cache_.rank = {0, true};
+    }
 
     Span::Span(const std::initializer_list<Vector> space) {
-        n_ = space.size();
-        space_ = new Vector[n_];
+        cache_.count = {space.size(), true};
+        space_ = new Vector[cache_.count.is];
 
         size_t i = 0;
         for (const auto& Vec : space) {
@@ -22,10 +27,9 @@ namespace Objects {
     }
 
     Span::Span(const Span &other) {
-        n_ = other.size();
-        space_ = new Vector[n_];
-        rank_ = other.rank_;
-        changed_ = other.changed_;
+        cache_.count = other.cache_.count;
+        cache_.rank = other.cache_.rank;
+        space_ = new Vector[cache_.count.is];
 
         size_t i = 0;
         for (const auto &vector : other) {
@@ -35,37 +39,37 @@ namespace Objects {
     }
 
     Span::Span(const size_t m, const size_t n) {
-        n_ = m;
-        space_ = new Vector[n_];
+        cache_.count = {m, true};
+        space_ = new Vector[cache_.count.is];
 
-        for (size_t i = 0; i < n_; i++) {
+        for (size_t i = 0; i < cache_.count.is; i++) {
             space_[i] = Vector(n);
         }
     }
+
     Span::~Span() {
         delete[] space_;
         space_ = nullptr;
     }
 
-    int Span::any_row_with_non_zero_in_col(const int r_, const int c_) { // NOLINT
-        for (int r = r_; r < n_; r++) {
+    int Span::any_row_with_non_zero_in_col(const int r_, const int c_) const { // NOLINT
+        for (int r = r_; r < cache_.count.is; r++) {
             if (space_[r][c_] != 0) return r;
         }
         return r_;
     }
 
-    void Span::set_dim() {
-        rank_ = 0;
+    void Span::set_dim() const {
+        cache_.rank = {0, true};
         Span copy(*this);
     }
 
-
     Span& Span::swap(const size_t p1, const size_t p2) {
-        if (n_ == 0) return *this;
-        if (p1 >= n_ || p2 >= n_) {
+        if (cache_.count.is == 0) return *this;
+        if (p1 >= cache_.count.is || p2 >= cache_.count.is) {
             std::cout << "\n";
             std::stringstream err("Index out of range:\n");
-            err << "Requested indexes: " << p1 << ", " << p2 << ", but the size of Span is: " << n_ << "\n";
+            err << "Requested indexes: " << p1 << ", " << p2 << ", but the size of Span is: " << cache_.count.is << "\n";
             throw std::out_of_range(err.str());
         }
 
@@ -76,14 +80,12 @@ namespace Objects {
         return *this;
     }
 
-
-    [[nodiscard]] dim_t Span::rank() const { return rank_; }
+    [[nodiscard]] dim_t Span::rank() const { return cache_.rank.is; }
     [[nodiscard]] dim_t Span::vector_dimension() const { return space_[0].dimension(); }
-    [[nodiscard]] size_t Span::size() const { return n_; }
-
+    [[nodiscard]] size_t Span::size() const { return cache_.count.is; }
 
     [[nodiscard]] Vector* Span::begin() const { return space_; }
-    [[nodiscard]] Vector* Span::end() const { return space_ + n_; }
+    [[nodiscard]] Vector* Span::end() const { return space_ + cache_.count.is; }
     [[nodiscard]] Vector* Span::begin() { return space_; }
-    [[nodiscard]] Vector* Span::end() { return space_ + n_; }
+    [[nodiscard]] Vector* Span::end() { return space_ + cache_.count.is; }
 } // Objects

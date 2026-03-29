@@ -12,47 +12,37 @@ namespace Objects {
     Vector::Vector() {
         components_ = new component_t[1];
         components_[0] = 0;
+        cache_.n.valid = true;
+        cache_.norm.valid = true;
     }
 
     Vector::Vector(const std::initializer_list<component_t> components) {
-        n_ = components.size();
-        if (n_ == 0) return;
+        cache_.n = {components.size(), true};
+        if (cache_.n.is == 0) return;
 
-        components_ = new component_t[n_];
+        components_ = new component_t[cache_.n.is];
 
         size_t i = 0;
         for (const auto component : components) {
             components_[i] = component;
             i++;
         }
-
-        if (norm() == 0) {
-            n_ = 0;
-            delete components_;
-            components_ = new component_t[1];
-            changed_ = true;
-        }
-        else isNullPtr = false;
     }
 
     Vector::Vector(const Vector &other) {
-        n_ = other.n_;
-        norm_ = other.norm_;
-        changed_ = other.changed_;
-        isNullPtr = other.isNullPtr;
+        cache_ = other.cache_;
 
-        components_ = new component_t[n_];
-        for (size_t i = 0; i < n_; i++) {
+        components_ = new component_t[cache_.n.is];
+        for (size_t i = 0; i < cache_.n.is; i++) {
             components_[i] = other[i];
         }
     }
 
     Vector::Vector(const size_t n) {
-        n_ = n;
-        components_ = new component_t[n_];
-        isNullPtr = false;
+        cache_.n = {n, true};
+        components_ = new component_t[cache_.n.is];
 
-        for (size_t i = 0; i < n_; i++) {
+        for (size_t i = 0; i < cache_.n.is; i++) {
             components_[i] = 0;
         }
     }
@@ -62,18 +52,17 @@ namespace Objects {
         components_ = nullptr;
     }
 
-    norm_t Vector::norm() { // NOLINT
-        if (!changed_) return norm_;
+    norm_t Vector::norm() const { // NOLINT
+        if (cache_.norm.valid) return cache_.norm.is;
 
         norm_t sum = 0;
-        for (size_t i = 0; i < n_; i++) sum += components_[i] * components_[i];
-        norm_ = std::sqrt(sum);
-        changed_ = false;
+        for (size_t i = 0; i < cache_.n.is; i++) sum += components_[i] * components_[i];
+        cache_.norm = {std::sqrt(sum), true};
 
-        return norm_;
+        return cache_.norm.is;
     }
 
 
-    [[nodiscard]] dim_t Vector::dimension() const { return n_; }
-    [[nodiscard]] bool Vector::is_null_vec() const { return isNullPtr; }
+    [[nodiscard]] dim_t Vector::dimension() const { return cache_.n.is; }
+    [[nodiscard]] bool Vector::is_null_vec() const { return norm() == 0; }
 } // Objects

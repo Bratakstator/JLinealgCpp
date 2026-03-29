@@ -19,6 +19,17 @@ namespace Objects {
     using size_t = std::initializer_list<component_t>::size_type;
     using dim_t = size_t;
 
+    template<typename T>
+    struct CacheInstance {
+        mutable T is;
+        mutable bool valid = false;
+    };
+
+    struct VectorCache {
+        mutable CacheInstance<dim_t> n{0, false};
+        mutable CacheInstance<norm_t> norm{0, false};
+    };
+
     /**
      * @brief Used as a proxy for the vector components.
      *
@@ -26,20 +37,12 @@ namespace Objects {
      */
     class ComponentProxy {
         component_t &component_;
-        bool &vec_changed_;
-        bool &span_changed_;
-        bool &isNullPtr_;
+        VectorCache &cache_;
 
     public:
-        friend class VectorProxy;
-        ComponentProxy(component_t &component, bool &changed, bool &isNullPtr)
-            : component_(component), vec_changed_(changed), span_changed_(changed), isNullPtr_(isNullPtr)
-        {}
-        ComponentProxy(component_t &component, bool &vec_changed, bool &span_changed, bool &isNullPtr)
-            : component_(component), vec_changed_(vec_changed), span_changed_(span_changed), isNullPtr_(isNullPtr)
-        {}
+        ComponentProxy(component_t &component, VectorCache &cache) : component_(component), cache_(cache) {}
 
-        operator component_t(); // NOLINT
+        operator component_t() const; // NOLINT
         ComponentProxy& operator=(component_t component);
         ComponentProxy& operator=(const ComponentProxy &component);
         ComponentProxy& operator+=(component_t component);
@@ -62,13 +65,8 @@ namespace Objects {
      * As a container object it will act like a mathematical vector, rather than purely a container of elements.
      */
     class Vector {
-        component_t *components_ = nullptr;
-        dim_t n_ = 0;
-
-        norm_t norm_ = 0;
-
-        bool changed_ = true;
-        bool isNullPtr = true;
+        mutable component_t *components_ = nullptr;
+        mutable VectorCache cache_;
 
     public:
         friend class VectorProxy;
@@ -105,7 +103,7 @@ namespace Objects {
         /**
          * Returns the norm (length) of the vector.
          */
-        norm_t norm();
+        norm_t norm() const;
 
         /**
          * @brief Returns the dimension the vector belongs to.\n

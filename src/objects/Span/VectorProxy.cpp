@@ -11,20 +11,20 @@ namespace Objects {
 
     VectorProxy& VectorProxy::operator=(const Vector &other) {
         vector_ = other;
-        changed_ = true;
+        cache_.rank.valid = false;
         return *this;
     }
     VectorProxy& VectorProxy::operator=(const VectorProxy &other) {
         if (this != &other) {
             vector_ = other.vector_;
-            changed_ = true;
+            cache_.rank.valid = false;
         }
         return *this;
     }
 
-    ComponentProxy VectorProxy::operator[](size_t i) { // NOLINT
-        const auto proxy(vector_[i]);
-        return {proxy.component_, proxy.vec_changed_, changed_, proxy.isNullPtr_};
+    ComponentPProxy VectorProxy::operator[](size_t i) { // NOLINT
+        ComponentProxy proxy(vector_[i]);
+        return {proxy, cache_};
     }
     double VectorProxy::operator[](const size_t i) const {
         return vector_[i];

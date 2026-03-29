@@ -7,8 +7,9 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    ComponentProxy Matrix::operator[](const size_t m, const size_t n) {
-        return row_space_[m][n];
+    ComponentPPProxy Matrix::operator[](const size_t m, const size_t n) {
+        auto proxy = row_space_[m][n];
+        return {proxy, cache_};
     }
     double Matrix::operator[](const size_t m, const size_t n) const {
         return row_space_[m][n];

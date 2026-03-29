@@ -37,86 +37,103 @@ namespace Objects {
         mutable Span R;
     };
 
-    struct SmallCache {
-        mutable bool is = false;
-        mutable bool valid = false;
-
-        SmallCache& operator=(const bool b) {
-            is = b;
-            valid = b;
-            return *this;
-        }
-
-        operator bool() const { return is && valid; } // NOLINT
-    };
-
     struct MatrixCache {
-        mutable SmallCache identity;
-        mutable SmallCache diagonal;
-        mutable SmallCache symmetrical;
-        mutable SmallCache skew_symmetrical;
+        mutable CacheInstance<bool> identity{false, false};
+        mutable CacheInstance<bool> diagonal{false, false};
+        mutable CacheInstance<bool> symmetrical{false, false};
+        mutable CacheInstance<bool> skew_symmetrical{false, false};
 
-        mutable SmallCache invertible;
+        mutable CacheInstance<bool> invertible{false, false};
 
-        mutable SmallCache upper_triangular;
-        mutable SmallCache lower_triangular;
+        mutable CacheInstance<bool> upper_triangular{false, false};
+        mutable CacheInstance<bool> lower_triangular{false, false};
 
-        mutable SmallCache orthonormal_columns;
-        mutable SmallCache orthogonal;
+        mutable CacheInstance<bool> orthonormal_columns{false, false};
+        mutable CacheInstance<bool> orthogonal{false, false};
 
-        mutable det_t det = 0;
-        mutable bool det_calculated = false;
+        mutable CacheInstance<det_t> det{0, false};
 
-        mutable bool REF_valid = false;
-        mutable bool REF_with_pivots_force_eq_one = false;
-        mutable Span REF;
+        mutable CacheInstance<Span> REF;
+        mutable CacheInstance<bool> REF_force_eq_one{false, false,};
+        mutable CacheInstance<Span> RREF;
+        mutable CacheInstance<PLU> plu;
+        mutable CacheInstance<QR> qr;
+        mutable CacheInstance<Span> inverse;
+        mutable CacheInstance<EigenPairs> eigen;
 
-        mutable bool RREF_valid = false;
-        mutable Span RREF;
+        void invalidate() { // NOLINT
+            identity.valid = false;
+            diagonal.valid = false;
+            symmetrical.valid = false;
+            skew_symmetrical.valid = false;
 
-        mutable bool PLU_valid = false;
-        mutable PLU plu;
+            invertible.valid = false;
 
-        mutable bool QR_valid = false;
-        mutable QR qr;
+            upper_triangular.valid = false;
+            lower_triangular.valid = false;
 
-        mutable bool inverse_valid = false;
-        mutable Span inverse;
+            orthonormal_columns.valid = false;
+            orthogonal.valid = false;
 
-        mutable bool eigen_valid = false;
-        mutable EigenPairs eigen;
+            det.valid = false;
+
+            REF = {{}, false};
+            REF_force_eq_one.valid = false;
+            RREF = {{}, false};
+            plu = {{}, false};
+            qr = {{}, false};
+            inverse = {{}, false};
+            eigen = {{}, false};
+        }
 
         void invertible_true() { // NOLINT
-            identity = true;
-            diagonal = true;
-            symmetrical = true;
+            identity.is = identity.valid = true;
+            diagonal.is = identity.valid = true;
+            symmetrical.is = identity.valid = true;
 
-            invertible = true;
+            invertible.is = invertible.valid = true;
 
-            upper_triangular = true;
-            lower_triangular = true;
+            upper_triangular.is = upper_triangular.valid = true;
+            lower_triangular.is = lower_triangular.valid = true;
 
-            orthonormal_columns = true;
-            orthogonal = true;
+            orthonormal_columns.is = orthonormal_columns.valid = true;
+            orthogonal.is = orthogonal.valid = true;
 
-            det = 1;
-            det_calculated = true;
+            det.is = 1;
+            det.valid = true;
         }
         void invertible_false() { // NOLINT
-            identity = false;
-            diagonal = false;
-            symmetrical = false;
+            identity.is = identity.valid = false;
+            diagonal.is = identity.valid = false;
+            symmetrical.is = identity.valid = false;
 
-            invertible = false;
+            invertible.is = invertible.valid = false;
 
-            upper_triangular = false;
-            lower_triangular = false;
+            upper_triangular.is = upper_triangular.valid = false;
+            lower_triangular.is = lower_triangular.valid = false;
 
-            orthonormal_columns = false;
-            orthogonal = false;
-
-            det_calculated = false;
+            orthonormal_columns.is = orthonormal_columns.valid = false;
+            orthogonal.is = orthogonal.valid = false;
         }
+    };
+
+    class ComponentPPProxy {
+        ComponentPProxy &proxy_;
+        MatrixCache &cache_;
+
+    public:
+        ComponentPPProxy(ComponentPProxy &proxy, MatrixCache &cache) : proxy_(proxy), cache_(cache) {}
+
+        //ComponentPPProxy(const ComponentPProxy & proxy, const MatrixCache & cache) : proxy_(proxy), cache_(cache) {}
+
+        operator component_t() const; // NOLINT
+        ComponentPPProxy& operator=(component_t component);
+        ComponentPPProxy& operator=(const ComponentProxy &component);
+        ComponentPPProxy& operator=(const ComponentPProxy &component);
+        ComponentPPProxy& operator=(const ComponentPPProxy &component);
+        ComponentPPProxy& operator+=(component_t component);
+        ComponentPPProxy& operator-=(component_t component);
+        ComponentPPProxy& operator/=(component_t component);
     };
 
     /**
@@ -166,7 +183,7 @@ namespace Objects {
          */
         Matrix(const Matrix &other);
 
-        ComponentProxy operator[](size_t m, size_t n); // NOLINT
+        ComponentPPProxy operator[](size_t m, size_t n); // NOLINT
         component_t operator[](size_t m, size_t n) const;
         Matrix operator*(const Matrix &other);
 

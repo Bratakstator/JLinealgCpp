@@ -36,19 +36,19 @@ namespace Objects {
 
     det_t Matrix::determinant() const {
         if (rows() != columns()) return 0;
-        if (cache_.det_calculated) return cache_.det;
+        if (cache_.det.valid) return cache_.det.is;
 
         Matrix A(1);
-        if (cache_.diagonal) A = *this;
-        else if (!cache_.REF_valid || cache_.REF_with_pivots_force_eq_one) A = row_echelon();
-        else A = Matrix(cache_.REF);
+        if (auto o = cache_.diagonal; o.is && o.valid) A = *this;
+        else if (o = cache_.REF_force_eq_one; !cache_.REF.valid || (o.is && o.valid)) A = row_echelon();
+        else A = Matrix(cache_.REF.is);
 
         det_t det = 1;
         for (size_t pivot = 0; pivot < rows(); pivot++) det *= A[pivot, pivot];
-        cache_.det = det;
-        cache_.det_calculated = true;
+        cache_.det.is = det;
+        cache_.det.valid = true;
 
-        return cache_.det;
+        return cache_.det.is;
     }
 
 
@@ -59,11 +59,11 @@ namespace Objects {
             cache_.identity.valid = true;
         }
         else if (cache_.diagonal.valid) {
-            cache_.identity = true;
+            cache_.identity.is = cache_.identity.valid = true;
             for (size_t pivot = 0; pivot < rows(); pivot++) if ((*this)[pivot, pivot] != 1) cache_.identity.is = false;
         }
         else {
-            cache_.identity = true;
+            cache_.identity.is = cache_.identity.valid = true;
             for (size_t row = 0; row < rows(); row++) {
                 for (size_t col = 0; col < columns(); col++) {
                     if ((row == col && (*this)[row, col] != 1) || (*this)[row, col] != 0) cache_.identity.is = false;

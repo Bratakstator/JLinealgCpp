@@ -16,6 +16,27 @@
 //  ----------------
 
 namespace Objects {
+    struct SpanCache {
+        mutable CacheInstance<size_t> count{0, false};
+        mutable CacheInstance<dim_t> rank{0, false};
+    };
+
+    class ComponentPProxy {
+        ComponentProxy &proxy_;
+        SpanCache &cache_;
+
+    public:
+        ComponentPProxy(ComponentProxy &proxy, SpanCache &cache) : proxy_(proxy), cache_(cache) {}
+
+        operator component_t() const; // NOLINT
+        ComponentPProxy& operator=(component_t component);
+        ComponentPProxy& operator=(const ComponentProxy &component);
+        ComponentPProxy& operator=(const ComponentPProxy &component);
+        ComponentPProxy& operator+=(component_t component);
+        ComponentPProxy& operator-=(component_t component);
+        ComponentPProxy& operator/=(component_t component);
+    };
+
     /**
      * @brief Acts as a proxy for the vector.
      *
@@ -23,17 +44,17 @@ namespace Objects {
      */
     class VectorProxy {
         Vector &vector_;
-        bool &changed_;
+        SpanCache &cache_;
 
     public:
-        VectorProxy(Vector &vector, bool &changed)
-            : vector_(vector), changed_(changed)
+        VectorProxy(Vector &vector, SpanCache &cache)
+            : vector_(vector), cache_(cache)
         {}
 
         operator Vector(); // NOLINT
         VectorProxy& operator=(const Vector &other);
         VectorProxy& operator=(const VectorProxy &other);
-        ComponentProxy operator[](size_t i);
+        ComponentPProxy operator[](size_t i);
         component_t operator[](size_t i) const;
     };
 
@@ -41,13 +62,11 @@ namespace Objects {
      * @brief Is a container of vectors representing the span of a vector space.
      */
     class Span {
-        Vector *space_ = nullptr;
-        size_t n_ = 0;
-        dim_t rank_ = 0;
-        bool changed_ = true;
+        mutable Vector *space_ = nullptr;
+        mutable SpanCache cache_;
 
-        int any_row_with_non_zero_in_col(int r_, int c_);
-        void set_dim();
+        int any_row_with_non_zero_in_col(int r_, int c_) const;
+        void set_dim() const;
 
     public:
         /**

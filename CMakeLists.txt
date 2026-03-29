@@ -10,8 +10,10 @@ add_executable(JLinealgCpp src/main.cpp
         src/objects/Span/Span_operators.cpp
         src/objects/Vector/Vector.cpp
         src/objects/Vector/Vector_operators.cpp
-        src/objects/Vector/DoubleProxy.cpp
+        src/objects/Vector/ComponentProxy.cpp
         src/objects/Span/VectorProxy.cpp
         src/objects/Matrix/Matrix_operations.cpp
         src/Tools/VectorTools.h
+        src/objects/Span/ComponentPProxy.cpp
+        src/objects/Matrix/ComponentPPProxy.cpp
 )

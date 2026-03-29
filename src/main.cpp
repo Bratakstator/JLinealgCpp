@@ -6,6 +6,7 @@ using Objects::Vector;
 using Objects::Matrix;
 
 int main() {
+    // Fix how proxies function
     Logging::setup();
 
     Matrix A(
