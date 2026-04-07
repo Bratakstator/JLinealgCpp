@@ -61,6 +61,7 @@ namespace Objects {
         components_ = nullptr;
     }
 
+
     norm_t Vector::norm() const { // NOLINT
         if (cache_.norm.valid) return cache_.norm.is;
 
@@ -69,6 +70,24 @@ namespace Objects {
         cache_.norm = {std::sqrt(sum), true};
 
         return cache_.norm.is;
+    }
+
+
+    component_t Vector::inner_product(const Vector &other) const {
+        component_t sum = 0;
+        for (size_t i = 0; i < cache_.n.is; i++) sum += components_[i] * components_[i];
+        return sum;
+    }
+
+    Matrix Vector::outer_product(const Vector &other) const {
+        Matrix A(dimension(), other.dimension());
+
+        for (int row = 0; row < dimension(); row++) {
+            for (int col = 0; col < other.dimension(); col++) {
+                A[row, col] = (*this)[row] * other[col];
+            }
+        }
+        return A;
     }
 
 
