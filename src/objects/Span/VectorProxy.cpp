@@ -23,8 +23,7 @@ namespace Objects {
     }
 
     ComponentPProxy VectorProxy::operator[](size_t i) { // NOLINT
-        ComponentProxy proxy(vector_[i]);
-        return {proxy, cache_};
+        return {vector_[i].component_, cache_, vector_[i].cache_};
     }
     double VectorProxy::operator[](const size_t i) const {
         return vector_[i];

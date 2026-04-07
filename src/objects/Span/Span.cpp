@@ -10,12 +10,17 @@ namespace Objects {
     Span::Span() {
         space_ = new Vector[1];
 
-        cache_.count = {0, true};
-        cache_.rank = {0, true};
+        cache_ = {
+            {0, true},
+            {0, true}
+        };
     }
 
     Span::Span(const std::initializer_list<Vector> space) {
-        cache_.count = {space.size(), true};
+        cache_ = {
+            {space.size(), true},
+            {0, false}
+        };
         space_ = new Vector[cache_.count.is];
 
         size_t i = 0;
@@ -27,8 +32,7 @@ namespace Objects {
     }
 
     Span::Span(const Span &other) {
-        cache_.count = other.cache_.count;
-        cache_.rank = other.cache_.rank;
+        cache_ = other.cache_;
         space_ = new Vector[cache_.count.is];
 
         size_t i = 0;
@@ -39,7 +43,10 @@ namespace Objects {
     }
 
     Span::Span(const size_t m, const size_t n) {
-        cache_.count = {m, true};
+        cache_ = {
+            {m, true},
+            {0, false}
+        };
         space_ = new Vector[cache_.count.is];
 
         for (size_t i = 0; i < cache_.count.is; i++) {

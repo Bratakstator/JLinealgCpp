@@ -26,8 +26,8 @@ namespace Objects {
     };
 
     struct VectorCache {
-        mutable CacheInstance<dim_t> n{0, false};
-        mutable CacheInstance<norm_t> norm{0, false};
+        mutable CacheInstance<dim_t> n;
+        mutable CacheInstance<norm_t> norm;
     };
 
     /**
@@ -39,6 +39,7 @@ namespace Objects {
         component_t &component_;
         VectorCache &cache_;
 
+        friend class VectorProxy;
     public:
         ComponentProxy(component_t &component, VectorCache &cache) : component_(component), cache_(cache) {}
 
@@ -97,8 +98,8 @@ namespace Objects {
         component_t operator[](size_t i) const;
         Vector& operator+=(const Vector &other);
         Vector& operator-=(const Vector &other);
-        bool operator==(Vector &other);
-        bool operator!=(Vector &other);
+        bool operator==(Vector &other) const;
+        bool operator!=(Vector &other) const;
 
         /**
          * Returns the norm (length) of the vector.

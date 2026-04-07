@@ -12,12 +12,18 @@ namespace Objects {
     Vector::Vector() {
         components_ = new component_t[1];
         components_[0] = 0;
-        cache_.n.valid = true;
-        cache_.norm.valid = true;
+
+        cache_ = {
+            {0, true},
+            {0, true}
+        };
     }
 
     Vector::Vector(const std::initializer_list<component_t> components) {
-        cache_.n = {components.size(), true};
+        cache_ = {
+            {components.size(), true},
+            {0, false}
+        };
         if (cache_.n.is == 0) return;
 
         components_ = new component_t[cache_.n.is];
@@ -39,7 +45,10 @@ namespace Objects {
     }
 
     Vector::Vector(const size_t n) {
-        cache_.n = {n, true};
+        cache_ = {
+            {n, true},
+            {0, false}
+        };
         components_ = new component_t[cache_.n.is];
 
         for (size_t i = 0; i < cache_.n.is; i++) {

@@ -13,19 +13,118 @@ namespace Objects {
         row_space_ = Span(n, n);
 
         for (size_t p = 0; p < rows(); p++) row_space_[p][p] = 1;
-        cache_.invertible_true();
+
+        cache_ = MatrixCache(
+            CacheInstance(true, true),
+            CacheInstance(true, true),
+            CacheInstance(true, true),
+            CacheInstance(false, true),
+            CacheInstance(true, true),
+
+            CacheInstance(true, true),
+            CacheInstance(true, true),
+
+            CacheInstance(true, true),
+            CacheInstance(true, true),
+
+            CacheInstance<det_t>(1, true),
+
+            CacheInstance(Span(row_space_), true),
+            CacheInstance(false, true),
+            CacheInstance(Span(row_space_), true),
+
+            CacheInstance(PLU(Span(), Span(), Span()), false),
+            CacheInstance(QR(Span(), Span()), false),
+            CacheInstance(Span(row_space_), true),
+            CacheInstance(EigenPairs(Vector(), Span()), false)
+        );
     }
 
     Matrix::Matrix(const size_t m, const size_t n) {
         row_space_ = Span(m, n);
+
+        cache_ = MatrixCache(
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance<det_t>(0, false),
+
+            CacheInstance(Span(), false),
+            CacheInstance(false, false),
+            CacheInstance(Span(), false),
+
+            CacheInstance(PLU(Span(), Span(), Span()), false),
+            CacheInstance(QR(Span(), Span()), false),
+            CacheInstance(Span(), false),
+            CacheInstance(EigenPairs(Vector(), Span()), false)
+        );
     }
 
     Matrix::Matrix(const Span &row_space) {
         row_space_ = row_space;
+
+        cache_ = MatrixCache(
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance<det_t>(0, false),
+
+            CacheInstance(Span(), false),
+            CacheInstance(false, false),
+            CacheInstance(Span(), false),
+
+            CacheInstance(PLU(Span(), Span(), Span()), false),
+            CacheInstance(QR(Span(), Span()), false),
+            CacheInstance(Span(), false),
+            CacheInstance(EigenPairs(Vector(), Span()), false)
+        );
     }
 
     Matrix::Matrix(const std::initializer_list<Vector> row_space) {
         row_space_ = Span(row_space);
+
+        cache_ = MatrixCache(
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance(false, false),
+            CacheInstance(false, false),
+
+            CacheInstance<det_t>(0, false),
+
+            CacheInstance(Span(), false),
+            CacheInstance(false, false),
+            CacheInstance(Span(), false),
+
+            CacheInstance(PLU(Span(), Span(), Span()), false),
+            CacheInstance(QR(Span(), Span()), false),
+            CacheInstance(Span(), false),
+            CacheInstance(EigenPairs(Vector(), Span()), false)
+        );
     }
 
     Matrix::Matrix(const Matrix &other) {

@@ -79,7 +79,7 @@ namespace Objects {
         return *this;
     }
 
-    bool Vector::operator==(Vector &other) {
+    bool Vector::operator==(Vector &other) const {
         if (!(is_null_vec() && other.is_null_vec())) return false;
         if (cache_.n.is != other.dimension()) return false;
         if (norm() != other.norm()) return false;
@@ -87,7 +87,7 @@ namespace Objects {
         return true;
     }
 
-    bool Vector::operator!=(Vector &other) {
+    bool Vector::operator!=(Vector &other) const {
         return !(*this == other);
     }
 } // Objects

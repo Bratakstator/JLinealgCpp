@@ -11,40 +11,41 @@ namespace Objects {
 
     ComponentPPProxy& ComponentPPProxy::operator=(component_t component) {
         proxy_ = component;
-        cache_.invalidate();
-        return *this;
-    }
-
-    ComponentPPProxy& ComponentPPProxy::operator=(const ComponentProxy &component) {
-        proxy_ = component;
-        cache_.invalidate();
-        return *this;
-    }
-
-    ComponentPPProxy& ComponentPPProxy::operator=(const ComponentPProxy &component) {
-        proxy_ = component;
-        cache_.invalidate();
+        mCache_.invalidate();
+        sCache_.rank.valid = false;
+        vCache_.norm.valid = false;
         return *this;
     }
 
     ComponentPPProxy& ComponentPPProxy::operator=(const ComponentPPProxy &component) {
         proxy_ = component.proxy_;
-        cache_.invalidate();
+        mCache_.invalidate();
+        sCache_.rank.valid = false;
+        vCache_.norm.valid = false;
         return *this;
     }
 
     ComponentPPProxy& ComponentPPProxy::operator+=(component_t component) {
         proxy_ += component;
+        mCache_.invalidate();
+        sCache_.rank.valid = false;
+        vCache_.norm.valid = false;
         return *this;
     }
 
     ComponentPPProxy& ComponentPPProxy::operator-=(component_t component) {
         proxy_-= component;
+        mCache_.invalidate();
+        sCache_.rank.valid = false;
+        vCache_.norm.valid = false;
         return *this;
     }
 
     ComponentPPProxy& ComponentPPProxy::operator/=(component_t component) {
         proxy_ /= component;
+        mCache_.invalidate();
+        sCache_.rank.valid = false;
+        vCache_.norm.valid = false;
         return *this;
     }
 }

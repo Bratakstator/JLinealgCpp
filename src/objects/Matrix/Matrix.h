@@ -38,23 +38,23 @@ namespace Objects {
     };
 
     struct MatrixCache {
-        mutable CacheInstance<bool> identity{false, false};
-        mutable CacheInstance<bool> diagonal{false, false};
-        mutable CacheInstance<bool> symmetrical{false, false};
-        mutable CacheInstance<bool> skew_symmetrical{false, false};
+        mutable CacheInstance<bool> identity;
+        mutable CacheInstance<bool> diagonal;
+        mutable CacheInstance<bool> symmetrical;
+        mutable CacheInstance<bool> skew_symmetrical;
 
-        mutable CacheInstance<bool> invertible{false, false};
+        mutable CacheInstance<bool> invertible;
 
-        mutable CacheInstance<bool> upper_triangular{false, false};
-        mutable CacheInstance<bool> lower_triangular{false, false};
+        mutable CacheInstance<bool> upper_triangular;
+        mutable CacheInstance<bool> lower_triangular;
 
-        mutable CacheInstance<bool> orthonormal_columns{false, false};
-        mutable CacheInstance<bool> orthogonal{false, false};
+        mutable CacheInstance<bool> orthonormal_columns;
+        mutable CacheInstance<bool> orthogonal;
 
-        mutable CacheInstance<det_t> det{0, false};
+        mutable CacheInstance<det_t> det;
 
         mutable CacheInstance<Span> REF;
-        mutable CacheInstance<bool> REF_force_eq_one{false, false,};
+        mutable CacheInstance<bool> REF_force_eq_one;
         mutable CacheInstance<Span> RREF;
         mutable CacheInstance<PLU> plu;
         mutable CacheInstance<QR> qr;
@@ -118,18 +118,20 @@ namespace Objects {
     };
 
     class ComponentPPProxy {
-        ComponentPProxy &proxy_;
-        MatrixCache &cache_;
+        component_t &proxy_;
+        MatrixCache &mCache_;
+        SpanCache &sCache_;
+        VectorCache & vCache_;
 
     public:
-        ComponentPPProxy(ComponentPProxy &proxy, MatrixCache &cache) : proxy_(proxy), cache_(cache) {}
+        ComponentPPProxy(component_t &proxy, MatrixCache &mCache, SpanCache &sCache, VectorCache &vCache)
+            : proxy_(proxy), mCache_(mCache), sCache_(sCache), vCache_(vCache) {}
 
-        //ComponentPPProxy(const ComponentPProxy & proxy, const MatrixCache & cache) : proxy_(proxy), cache_(cache) {}
+        ComponentPPProxy(ComponentPProxy &comppproxy, MatrixCache &mCache) // NOLINT
+            : proxy_(comppproxy.proxy_), mCache_(mCache), sCache_(comppproxy.sCache_), vCache_(comppproxy.vCache_) {}
 
         operator component_t() const; // NOLINT
         ComponentPPProxy& operator=(component_t component);
-        ComponentPPProxy& operator=(const ComponentProxy &component);
-        ComponentPPProxy& operator=(const ComponentPProxy &component);
         ComponentPPProxy& operator=(const ComponentPPProxy &component);
         ComponentPPProxy& operator+=(component_t component);
         ComponentPPProxy& operator-=(component_t component);

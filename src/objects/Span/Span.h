@@ -17,20 +17,22 @@
 
 namespace Objects {
     struct SpanCache {
-        mutable CacheInstance<size_t> count{0, false};
-        mutable CacheInstance<dim_t> rank{0, false};
+        mutable CacheInstance<size_t> count;
+        mutable CacheInstance<dim_t> rank;
     };
 
     class ComponentPProxy {
-        ComponentProxy &proxy_;
-        SpanCache &cache_;
+        component_t &proxy_;
+        SpanCache &sCache_;
+        VectorCache &vCache_;
 
+        friend class ComponentPPProxy;
     public:
-        ComponentPProxy(ComponentProxy &proxy, SpanCache &cache) : proxy_(proxy), cache_(cache) {}
+        ComponentPProxy(component_t &proxy, SpanCache &sCache, VectorCache &vCache)
+            : proxy_(proxy), sCache_(sCache), vCache_(vCache) {}
 
         operator component_t() const; // NOLINT
         ComponentPProxy& operator=(component_t component);
-        ComponentPProxy& operator=(const ComponentProxy &component);
         ComponentPProxy& operator=(const ComponentPProxy &component);
         ComponentPProxy& operator+=(component_t component);
         ComponentPProxy& operator-=(component_t component);
