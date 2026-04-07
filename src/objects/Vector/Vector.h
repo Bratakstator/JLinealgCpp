@@ -96,8 +96,11 @@ namespace Objects {
         Vector& operator=(const Vector &other);
         ComponentProxy operator[](size_t i);
         component_t operator[](size_t i) const;
+
         Vector& operator+=(const Vector &other);
         Vector& operator-=(const Vector &other);
+        Vector& operator*=(component_t c);
+
         bool operator==(Vector &other) const;
         bool operator!=(Vector &other) const;
 
