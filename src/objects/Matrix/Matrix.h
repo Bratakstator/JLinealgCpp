@@ -144,6 +144,14 @@ namespace Objects {
      * Does not contain default constructor, must be made either with a list of vectors or with an explicit size.
      */
     class Matrix {
+        class AugmentedMatrix {
+            Matrix &A_;
+            Matrix &B_;
+
+        public:
+            AugmentedMatrix(Matrix &A, Matrix &B) : A_(A), B_(B) {}
+        };
+
         mutable Span row_space_;
         mutable MatrixCache cache_;
 
