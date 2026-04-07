@@ -138,20 +138,55 @@ namespace Objects {
         ComponentPPProxy& operator/=(component_t component);
     };
 
+
+    template<typename T>
+    concept VectorProxyOnly = std::same_as<T, VectorProxy> || std::same_as<T, VectorProxy&>;
+
+    template<VectorProxyOnly T>
+        class AugmentedMatrixVectorPair {
+        T v1_;
+        T v2_;
+
+        friend AugmentedMatrixVectorPair<VectorProxy> operator*
+            (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v);
+
+    public:
+        AugmentedMatrixVectorPair(T v1, T v2) : v1_(v1), v2_(v2) {}
+
+        operator Vector() const;
+
+        AugmentedMatrixVectorPair operator-=(AugmentedMatrixVectorPair v);
+        AugmentedMatrixVectorPair operator/=(const component_t component); // NOLINT
+        AugmentedMatrixVectorPair operator*=(component_t component);
+    };
+
+    class AugmentedMatrix {
+        Matrix &A_;
+        Matrix &B_;
+
+    public:
+        AugmentedMatrix(Matrix &A, Matrix &B) : A_(A), B_(B) {}
+
+        [[nodiscard]] Matrix& A() const;
+        [[nodiscard]] Matrix& B() const;
+
+        AugmentedMatrixVectorPair<VectorProxy&> operator[](size_t i);
+        AugmentedMatrixVectorPair<VectorProxy> operator[](size_t i) const;
+
+        code_t swap_rows(const size_t r1, const size_t r2, const code_t code=0) const; // NOLINT
+    };
+
+    inline AugmentedMatrixVectorPair<VectorProxy> operator*
+        (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v) {
+        return {v.v1_ * component, v.v2_ * component};
+    }
+
     /**
      * @brief Matrix is a fixed-sized container operating as a mathematical object.
      *
      * Does not contain default constructor, must be made either with a list of vectors or with an explicit size.
      */
     class Matrix {
-        class AugmentedMatrix {
-            Matrix &A_;
-            Matrix &B_;
-
-        public:
-            AugmentedMatrix(Matrix &A, Matrix &B) : A_(A), B_(B) {}
-        };
-
         mutable Span row_space_;
         mutable MatrixCache cache_;
 
@@ -167,8 +202,10 @@ namespace Objects {
          * <code> code_t code = swap_rows(2, 4, 15); // returns 128 + 15 = 143 </code>\n
          * <code> code_t code_actual = code - 128; // code_actual = 143 - 128 = 15 </code>
          */
-        code_t swap_rows(size_t r1, size_t r2, code_t code=0) const;
+        code_t swap_rows(size_t r1, size_t r2, code_t code=0);
 
+        static void do_row_echelon(const AugmentedMatrix &AB, bool pivots_must_be_one=false);
+        void do_reduced_row_echelon(AugmentedMatrix &AB) const;
     public:
         Matrix() = delete;
 
@@ -254,6 +291,8 @@ namespace Objects {
         [[nodiscard]] size_t rank() const;
 
         void print() const;
+
+        friend class AugmentedMatrix;
     };
 } // Objects
 

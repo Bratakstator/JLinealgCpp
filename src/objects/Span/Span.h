@@ -56,6 +56,8 @@ namespace Objects {
         operator Vector(); // NOLINT
         VectorProxy& operator=(const Vector &other);
         VectorProxy& operator=(const VectorProxy &other);
+        VectorProxy& operator/=(component_t component);
+        VectorProxy operator*(component_t component);
         ComponentPProxy operator[](size_t i);
         component_t operator[](size_t i) const;
     };

@@ -7,7 +7,7 @@
 #include "../Vector/Vector.h"
 
 namespace Objects {
-    code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) const {
+    code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) { // NOLINT
         if (code != 0) return 128 + code;
         if (r1 == r2) return 1;
 
@@ -19,6 +19,38 @@ namespace Objects {
 
         return 0;
     }
+
+    void Matrix::do_row_echelon(const AugmentedMatrix &AB, const bool pivots_must_be_one) {
+        for (size_t pivot = 0; pivot < AB.A().rows(); pivot++) {
+            auto pivot_col = pivot;
+
+            for (size_t row = pivot; row < AB.A().rows(); row++) {
+                component_t pivot_val = AB.A()[pivot, pivot_col];
+                component_t factor = AB.A()[row, pivot_col];
+                if (pivot_val != 0) factor /= pivot_val;
+
+                for (size_t col = pivot_col; col < AB.A().columns(); col++) {
+                    if (pivot_val == 0 && AB.A()[pivot, col] == 0) {
+                        auto [index, code] = AB.A().get_non_zero_row_in_col(col, pivot);
+                        if (AB.swap_rows(pivot, index, code) == 0) {
+                            pivot_col = col;
+                            pivot_val = AB.A()[pivot, pivot_col];
+                        }
+                    }
+                    else if (pivot_val == 0 && AB.A()[pivot, col] != 0) {
+                        pivot_col = col;
+                        pivot_val = AB.A()[pivot, pivot_col];
+                    }
+                }
+
+                if (row == pivot && pivots_must_be_one) AB[row] /= pivot_val;
+                else AB[row] -= factor * AB[pivot];
+
+                if (pivot_val == 0) pivot = AB.A().rows();
+            }
+        }
+    }
+
 
     Code Matrix::get_non_zero_row_in_col(const size_t col, const size_t current_row) const {
         for (size_t row = current_row; row < rows(); row++) {
@@ -44,34 +76,9 @@ namespace Objects {
             for (size_t p = 0; p < ech.rows(); p++) ech[p, p] = 1;
         }
         else {
-            for (size_t pivot = 0; pivot < ech.rows(); pivot++) {
-                auto pivot_col = pivot;
-
-                for (size_t row = pivot; row < ech.rows(); row++) {
-                    component_t pivot_val = ech[pivot, pivot_col];
-                    component_t factor = ech[row, pivot_col];
-                    if (pivot_val != 0) factor /= pivot_val;
-
-                    for (size_t col = pivot_col; col < ech.columns(); col++) {
-                        if (pivot_val == 0 && ech[pivot, col] == 0) {
-                            auto [index, code] = ech.get_non_zero_row_in_col(col, pivot);
-                            if (ech.swap_rows(pivot, index, code) == 0) {
-                                pivot_col = col;
-                                pivot_val = ech[pivot, pivot_col];
-                            }
-                            else continue;
-                        }
-                        else if (pivot_val == 0 && ech[pivot, col] != 0) {
-                            pivot_col = col;
-                            pivot_val = ech[pivot, pivot_col];
-                        }
-
-                        if (row == pivot && pivots_must_be_one) ech[row, col] /= pivot_val;
-                        else if (row != pivot) ech[row, col] -= factor * ech[pivot, col];
-                    }
-                    if (pivot_val == 0) pivot = ech.rows();
-                }
-            }
+            Matrix I(rows(), 1);
+            AugmentedMatrix AM(ech, I);
+            do_row_echelon(AM, pivots_must_be_one);
         }
 
         cache_.REF.valid = true;

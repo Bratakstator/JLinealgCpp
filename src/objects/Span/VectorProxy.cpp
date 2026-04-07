@@ -22,6 +22,12 @@ namespace Objects {
         return *this;
     }
 
+    VectorProxy& VectorProxy::operator/=(const component_t component) {
+        vector_ /= component;
+        cache_.rank.valid = false;
+        return *this;
+    }
+
     ComponentPProxy VectorProxy::operator[](size_t i) { // NOLINT
         return {vector_[i].component_, cache_, vector_[i].cache_};
     }
