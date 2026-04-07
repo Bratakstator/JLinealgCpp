@@ -127,6 +127,10 @@ namespace Objects {
     inline Vector operator-(Vector l, const Vector &r) {
         return l -= r;
     }
+
+    inline Vector operator*(Vector l, const component_t &r) {
+        return l *= r;
+    }
 } // Objects
 
 #endif //JLINEALGCPP_VECTOR_H
