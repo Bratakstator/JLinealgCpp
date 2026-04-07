@@ -205,7 +205,7 @@ namespace Objects {
         code_t swap_rows(size_t r1, size_t r2, code_t code=0);
 
         static void do_row_echelon(const AugmentedMatrix &AB, bool pivots_must_be_one=false);
-        void do_reduced_row_echelon(AugmentedMatrix &AB) const;
+        static void do_reduced_row_echelon(const AugmentedMatrix &AB);
     public:
         Matrix() = delete;
 

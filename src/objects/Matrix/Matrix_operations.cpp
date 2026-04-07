@@ -51,6 +51,21 @@ namespace Objects {
         }
     }
 
+    void Matrix::do_reduced_row_echelon(const AugmentedMatrix &AB) {
+        for (size_t pivot_complement = 0; pivot_complement < AB.A().rows(); pivot_complement++) {
+            const auto pivot = (AB.A().rows() - 1) - pivot_complement;
+            auto [pivot_col, code] = AB.A().get_first_non_zero_col(pivot);
+            if (code == -1) continue;
+
+            for (size_t row_complement = 0; row_complement < pivot; row_complement++) {
+                const auto row = (pivot - 1) - row_complement;
+                component_t factor = AB.A()[row, pivot_col];
+
+                AB[row] -= factor * AB[pivot];
+            }
+        }
+    }
+
 
     Code Matrix::get_non_zero_row_in_col(const size_t col, const size_t current_row) const {
         for (size_t row = current_row; row < rows(); row++) {
@@ -76,9 +91,9 @@ namespace Objects {
             for (size_t p = 0; p < ech.rows(); p++) ech[p, p] = 1;
         }
         else {
-            Matrix I(rows(), 1);
-            AugmentedMatrix AM(ech, I);
-            do_row_echelon(AM, pivots_must_be_one);
+            Matrix B(rows(), 1);
+            AugmentedMatrix AB(ech, B);
+            do_row_echelon(AB, pivots_must_be_one);
         }
 
         cache_.REF.valid = true;
@@ -93,20 +108,9 @@ namespace Objects {
 
         Matrix ech = row_echelon(true);
         if (auto [is, valid] = cache_.diagonal; !(is && valid)) {
-            for (size_t pivot_complement = 0; pivot_complement < ech.rows(); pivot_complement++) {
-                const auto pivot = (ech.rows() - 1) - pivot_complement;
-                auto [pivot_col, code] = ech.get_first_non_zero_col(pivot);
-                if (code == -1) continue;
-
-                for (size_t row_complement = 0; row_complement < pivot; row_complement++) {
-                    const auto row = (pivot - 1) - row_complement;
-                    const component_t factor = ech[row, pivot_col];
-
-                    for (size_t col = pivot_col; col < ech.columns(); col++) {
-                        ech[row, col] -= factor * ech[pivot, col];
-                    }
-                }
-            }
+            Matrix B(rows(), 1);
+            AugmentedMatrix AB(ech, B);
+            do_reduced_row_echelon(AB);
         }
 
         cache_.RREF.valid = true;
