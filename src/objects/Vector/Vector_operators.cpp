@@ -85,6 +85,11 @@ namespace Objects {
         return *this;
     }
 
+    Vector& Vector::operator/=(const component_t c) {
+        if (!is_null_vec()) for (size_t i = 0; i < cache_.n.is; i++) components_[i] /= c;
+        return *this;
+    }
+
 
     bool Vector::operator==(Vector &other) const {
         if (!(is_null_vec() && other.is_null_vec())) return false;

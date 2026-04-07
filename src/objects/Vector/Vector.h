@@ -100,6 +100,7 @@ namespace Objects {
         Vector& operator+=(const Vector &other);
         Vector& operator-=(const Vector &other);
         Vector& operator*=(component_t c);
+        Vector& operator/=(component_t c);
 
         bool operator==(Vector &other) const;
         bool operator!=(Vector &other) const;
@@ -120,17 +121,10 @@ namespace Objects {
         [[nodiscard]] bool is_null_vec() const;
     };
 
-    inline Vector operator+(Vector l, const Vector &r) {
-        return l += r;
-    }
-
-    inline Vector operator-(Vector l, const Vector &r) {
-        return l -= r;
-    }
-
-    inline Vector operator*(Vector l, const component_t &r) {
-        return l *= r;
-    }
+    inline Vector operator+(Vector l, const Vector &r) { return l += r; }
+    inline Vector operator-(Vector l, const Vector &r) { return l -= r; }
+    inline Vector operator*(Vector l, const component_t &r) { return l *= r; }
+    inline Vector operator/(Vector l, const component_t &r) { return l /= r; }
 } // Objects
 
 #endif //JLINEALGCPP_VECTOR_H
