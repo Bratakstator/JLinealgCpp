@@ -34,7 +34,16 @@ int main() {
     B.print();
     std::cout << "B's row echelon form:\n";
     B.row_echelon().print();
-    std::cout << "det(B) = " << B.determinant() << "\n";
+    std::cout << "det(B) = " << B.determinant() << "\n\n";
+
+    std::cout << "Inverting A:\n";
+    Matrix I = A.invert();
+
+    std::cout << "A inverse =\n";
+    I.print();
+    std::cout << "Verifying actual inverse by doing A * A^-1:\n";
+    Matrix AI = A * I;
+    AI.print();
 
     return 0;
 }

@@ -217,6 +217,12 @@ namespace Objects {
         Matrix reduced_row_echelon() const;
 
         /**
+         * @brief Returns the inverted matrix.
+         * Also stores the inverted matrix in cache.
+         */
+        Matrix invert() const;
+
+        /**
          * @brief Returns the transposed matrix.
          */
         Matrix transpose() const;

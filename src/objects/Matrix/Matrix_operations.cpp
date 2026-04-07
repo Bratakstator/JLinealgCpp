@@ -107,6 +107,64 @@ namespace Objects {
         return ech;
     }
 
+    Matrix Matrix::invert() const {
+        if (cache_.inverse.valid) return Matrix(cache_.inverse.is);
+
+        if (!cache_.invertible.valid) {
+            if (rows() != columns()) {
+                cache_.invertible = {false, true};
+                throw std::invalid_argument("Matrix is not square.");
+            }
+            cache_.invertible = {true, true};
+        }
+
+        Matrix I(rows());
+        std::cout << "\nMatrix::invert() | Printing I\n";
+        I.print();
+        if (cache_.diagonal.valid && cache_.diagonal.is) {
+            if (cache_.identity.valid && cache_.identity.is) return *this;
+            for (size_t pivot = 0; pivot < rows(); pivot++) I[pivot, pivot] = 1/(*this)[pivot, pivot];
+        }
+        else {
+            Matrix A(rows(), 2 * rows());
+            Matrix current = (*this);
+            std::cout << "A[row, col + i * (A.columns()/2)] = current[row, col]\n";
+            for (size_t i = 0; i < 2; i++) {
+                std::cout << "Current Matrix:\n";
+                current.print();
+                for (size_t row = 0; row < A.rows(); row++) {
+                    for (size_t col = 0; col < A.columns()/2; col++) {
+                        A[row, col + i * (A.columns()/2)] = current[row, col];
+                        std::cout << "A[" << row << ", " << col << " + " << i << " * ";
+                        std::cout << A.columns() << "/2] = current[" << row << ", " << col << "] => A[";
+                        std::cout << row << ", " << col + i * (A.columns()/2) << "] = current[" << row << ", ";
+                        std::cout << col << "] =>\n";
+
+                        std::cout << A[row, col+i*(A.columns()/2)] << " = " << current[row, col] << ":\n";
+                        A.print();
+                    }
+                }
+                current = Matrix(rows());
+            }
+
+            std::cout << "A before reduced row echelon:\n";
+            A.print();
+            A = A.reduced_row_echelon();
+            std::cout << "A after reduced row echelon:\n";
+            A.print();
+
+            for (size_t row = 0; row < rows(); row++) {
+                for (size_t col = 0; col < A.columns()/2; col++) {
+                    I[row, col] = A[row, col + A.columns()/2];
+                }
+            }
+        }
+
+        cache_.inverse.is = I.row_space_;
+        cache_.inverse.valid = true;
+        return I;
+    }
+
     Matrix Matrix::transpose() const {
         Matrix T(columns(), rows());
 
