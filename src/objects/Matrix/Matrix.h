@@ -5,6 +5,9 @@
 #ifndef JLINEALGCPP_MATRIX_H
 #define JLINEALGCPP_MATRIX_H
 
+#include <iomanip>
+
+#include "../../logging/Logger.h"
 #include "../Span/Span.h"
 
 namespace Objects {
@@ -125,10 +128,12 @@ namespace Objects {
 
     public:
         ComponentPPProxy(component_t &proxy, MatrixCache &mCache, SpanCache &sCache, VectorCache &vCache)
-            : proxy_(proxy), mCache_(mCache), sCache_(sCache), vCache_(vCache) {}
+            : proxy_(proxy), mCache_(mCache), sCache_(sCache), vCache_(vCache)
+        {}
 
         ComponentPPProxy(ComponentPProxy &comppproxy, MatrixCache &mCache) // NOLINT
-            : proxy_(comppproxy.proxy_), mCache_(mCache), sCache_(comppproxy.sCache_), vCache_(comppproxy.vCache_) {}
+            : proxy_(comppproxy.proxy_), mCache_(mCache), sCache_(comppproxy.sCache_), vCache_(comppproxy.vCache_)
+        {}
 
         operator component_t() const; // NOLINT
         ComponentPPProxy& operator=(component_t component);
@@ -140,46 +145,88 @@ namespace Objects {
 
 
     template<typename T>
-    concept VectorProxyOnly = std::same_as<T, VectorProxy> || std::same_as<T, VectorProxy&>;
+    concept VectorProxyOnly = std::same_as<T, VectorProxy> || std::same_as<T, Vector>;
 
     template<VectorProxyOnly T>
-        class AugmentedMatrixVectorPair {
+    class AugmentedMatrixVectorPair {
         T v1_;
         T v2_;
 
-        friend AugmentedMatrixVectorPair<VectorProxy> operator*
-            (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v);
+        MatrixCache &v1_cache_;
+        MatrixCache &v2_cache_;
+
+        friend AugmentedMatrixVectorPair<Vector> operator*
+            (const component_t &component, AugmentedMatrixVectorPair<Vector> v);
+
+        friend class AugmentedMatrixVectorPair<VectorProxy>;
+        friend class AugmentedMatrixVectorPair<Vector>;
+
+        //friend AugmentedMatrixVectorPair<VectorProxy> operator-=
+        //    (AugmentedMatrixVectorPair<VectorProxy> &vp, AugmentedMatrixVectorPair<Vector> v);
 
     public:
-        AugmentedMatrixVectorPair(T v1, T v2) : v1_(v1), v2_(v2) {}
+        AugmentedMatrixVectorPair(VectorProxy v1, VectorProxy v2, MatrixCache &v1_cache, MatrixCache &v2_cache)
+            : v1_(v1), v2_(v2), v1_cache_(v1_cache), v2_cache_(v2_cache)
+        {}
 
-        operator Vector() const;
+        AugmentedMatrixVectorPair(const Vector& v1, const Vector& v2, MatrixCache &v1_cache, MatrixCache &v2_cache)
+            : v1_cache_(v1_cache), v2_cache_(v2_cache) {
+            v1_ = v1;
+            v2_ = v2;
+        }
 
-        AugmentedMatrixVectorPair operator-=(AugmentedMatrixVectorPair v);
-        AugmentedMatrixVectorPair operator/=(const component_t component); // NOLINT
-        AugmentedMatrixVectorPair operator*=(component_t component);
+        operator Vector() const { return v1_; }
+        operator AugmentedMatrixVectorPair<Vector>() const { return {v1_, v2_, v1_cache_, v2_cache_}; }
+
+        template<VectorProxyOnly K>
+        AugmentedMatrixVectorPair& operator-=(const AugmentedMatrixVectorPair<K> &v) {
+            v1_ -= v.v1_;
+            v2_ -= v.v2_;
+
+            if (std::same_as<T, VectorProxy>) {
+                v1_cache_.invalidate();
+                v2_cache_.invalidate();
+            }
+
+            return *this;
+        }
+        AugmentedMatrixVectorPair& operator/=(const component_t component) {
+            v1_ /= component;
+            v2_ /= component;
+
+            if (std::same_as<T, VectorProxy>) {
+                v1_cache_.invalidate();
+                v2_cache_.invalidate();
+            }
+
+            return *this;
+        }
+        AugmentedMatrixVectorPair& operator*=(const component_t component) {
+            v1_ *= component;
+            v2_ *= component;
+
+            if (std::same_as<T, VectorProxy>) {
+                v1_cache_.invalidate();
+                v2_cache_.invalidate();
+            }
+
+            return *this;
+        }
     };
 
-    class AugmentedMatrix {
-        Matrix &A_;
-        Matrix &B_;
-
-    public:
-        AugmentedMatrix(Matrix &A, Matrix &B) : A_(A), B_(B) {}
-
-        [[nodiscard]] Matrix& A() const;
-        [[nodiscard]] Matrix& B() const;
-
-        AugmentedMatrixVectorPair<VectorProxy&> operator[](size_t i);
-        AugmentedMatrixVectorPair<VectorProxy> operator[](size_t i) const;
-
-        code_t swap_rows(const size_t r1, const size_t r2, const code_t code=0) const; // NOLINT
-    };
-
-    inline AugmentedMatrixVectorPair<VectorProxy> operator*
-        (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v) {
-        return {v.v1_ * component, v.v2_ * component};
+    inline AugmentedMatrixVectorPair<Vector> operator*
+        (const component_t &component, AugmentedMatrixVectorPair<Vector> v) {
+        return {v.v1_ *= component, v.v2_ *= component, v.v1_cache_, v.v2_cache_};
     }
+
+    //inline AugmentedMatrixVectorPair<VectorProxy> operator-=
+    //    (AugmentedMatrixVectorPair<VectorProxy> &vp, const AugmentedMatrixVectorPair<Vector> v) {
+    //    vp.v1_ -= v.v1_;
+    //    vp.v2_ -= v.v2_;
+    //    return vp;
+    //}
+
+    class AugmentedMatrix;
 
     /**
      * @brief Matrix is a fixed-sized container operating as a mathematical object.
@@ -293,6 +340,44 @@ namespace Objects {
         void print() const;
 
         friend class AugmentedMatrix;
+    };
+
+    class AugmentedMatrix {
+        Matrix &A_;
+        Matrix &B_;
+
+    public:
+        AugmentedMatrix(Matrix &A, Matrix &B) : A_(A), B_(B) {}
+
+        [[nodiscard]] Matrix& A() const { return A_; }
+        [[nodiscard]] Matrix& B() const { return B_; }
+
+        AugmentedMatrixVectorPair<VectorProxy> operator[](const size_t i) const {
+            return {A_.row_space_[i], B_.row_space_[i], A_.cache_, B_.cache_};
+        }
+        //AugmentedMatrixVectorPair<Vector> operator[](const size_t i) const {
+        //    return {A_.row_space_[i], B_.row_space_[i]};
+        //}
+
+        code_t swap_rows(const size_t r1, const size_t r2, const code_t code) const { // NOLINT
+            B_.swap_rows(r1, r2, code);
+            return A_.swap_rows(r1, r2, code);
+        }
+
+        void print() const {
+            std::cout << std::fixed << std::setprecision(2);
+
+            for (size_t row = 0; row < A_.rows(); row++) {
+                for (size_t col = 0; col < A_.columns(); col++) {
+                    std::cout << A_[row, col] << "  ";
+                }
+                std::cout << "\t\t| ";
+                for (size_t col = 0; col < B_.columns(); col++) {
+                    std::cout << B_[row, col] << "  ";
+                }
+                std::cout << "\n";
+            }
+        }
     };
 } // Objects
 

@@ -41,9 +41,15 @@ int main() {
 
     std::cout << "A inverse =\n";
     I.print();
+
+    std::cout << "A | A^-1:\n";
+    Objects::AugmentedMatrix AM(A, I);
+    AM.print();
     std::cout << "Verifying actual inverse by doing A * A^-1:\n";
     Matrix AI = A * I;
     AI.print();
+
+    auto LOL = AI.reduced_row_echelon();
 
     return 0;
 }

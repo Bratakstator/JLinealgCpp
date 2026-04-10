@@ -9,7 +9,7 @@
 namespace Objects {
     ComponentPPProxy::operator component_t() const { return proxy_; } // NOLINT
 
-    ComponentPPProxy& ComponentPPProxy::operator=(component_t component) {
+    ComponentPPProxy& ComponentPPProxy::operator=(const component_t component) {
         proxy_ = component;
         mCache_.invalidate();
         sCache_.rank.valid = false;
@@ -25,7 +25,7 @@ namespace Objects {
         return *this;
     }
 
-    ComponentPPProxy& ComponentPPProxy::operator+=(component_t component) {
+    ComponentPPProxy& ComponentPPProxy::operator+=(const component_t component) {
         proxy_ += component;
         mCache_.invalidate();
         sCache_.rank.valid = false;

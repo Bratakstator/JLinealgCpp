@@ -22,9 +22,27 @@ namespace Objects {
         return *this;
     }
 
+    VectorProxy& VectorProxy::operator-=(const VectorProxy &other) {
+        cache_.rank.valid = false;
+        vector_ -= other.vector_;
+        return *this;
+    }
+
+    VectorProxy& VectorProxy::operator-=(const Vector &other) {
+        cache_.rank.valid = false;
+        vector_ -= other;
+        return *this;
+    }
+
     VectorProxy& VectorProxy::operator/=(const component_t component) {
         vector_ /= component;
         cache_.rank.valid = false;
+        return *this;
+    }
+
+    VectorProxy& VectorProxy::operator*=(const component_t component) {
+        cache_.rank.valid = false;
+        vector_ *= component;
         return *this;
     }
 

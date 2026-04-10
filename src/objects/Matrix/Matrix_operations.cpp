@@ -44,7 +44,9 @@ namespace Objects {
                 }
 
                 if (row == pivot && pivots_must_be_one) AB[row] /= pivot_val;
-                else AB[row] -= factor * AB[pivot];
+                else if (row != pivot) {
+                    AB[row] -= factor * AB[pivot];
+                }
 
                 if (pivot_val == 0) pivot = AB.A().rows();
             }
@@ -61,7 +63,9 @@ namespace Objects {
                 const auto row = (pivot - 1) - row_complement;
                 component_t factor = AB.A()[row, pivot_col];
 
-                AB[row] -= factor * AB[pivot];
+                if (row != pivot) {
+                    AB[row] -= factor * AB[pivot];
+                }
             }
         }
     }
@@ -129,51 +133,21 @@ namespace Objects {
             cache_.invertible = {true, true};
         }
 
-        Matrix I(rows());
-        std::cout << "\nMatrix::invert() | Printing I\n";
-        I.print();
+        Matrix B(rows());
         if (cache_.diagonal.valid && cache_.diagonal.is) {
             if (cache_.identity.valid && cache_.identity.is) return *this;
-            for (size_t pivot = 0; pivot < rows(); pivot++) I[pivot, pivot] = 1/(*this)[pivot, pivot];
+            for (size_t pivot = 0; pivot < rows(); pivot++) B[pivot, pivot] = 1/(*this)[pivot, pivot];
         }
         else {
-            Matrix A(rows(), 2 * rows());
-            Matrix current = (*this);
-            std::cout << "A[row, col + i * (A.columns()/2)] = current[row, col]\n";
-            for (size_t i = 0; i < 2; i++) {
-                std::cout << "Current Matrix:\n";
-                current.print();
-                for (size_t row = 0; row < A.rows(); row++) {
-                    for (size_t col = 0; col < A.columns()/2; col++) {
-                        A[row, col + i * (A.columns()/2)] = current[row, col];
-                        std::cout << "A[" << row << ", " << col << " + " << i << " * ";
-                        std::cout << A.columns() << "/2] = current[" << row << ", " << col << "] => A[";
-                        std::cout << row << ", " << col + i * (A.columns()/2) << "] = current[" << row << ", ";
-                        std::cout << col << "] =>\n";
-
-                        std::cout << A[row, col+i*(A.columns()/2)] << " = " << current[row, col] << ":\n";
-                        A.print();
-                    }
-                }
-                current = Matrix(rows());
-            }
-
-            std::cout << "A before reduced row echelon:\n";
-            A.print();
-            A = A.reduced_row_echelon();
-            std::cout << "A after reduced row echelon:\n";
-            A.print();
-
-            for (size_t row = 0; row < rows(); row++) {
-                for (size_t col = 0; col < A.columns()/2; col++) {
-                    I[row, col] = A[row, col + A.columns()/2];
-                }
-            }
+            Matrix A = *this;
+            AugmentedMatrix AB(A, B);
+            do_row_echelon(AB, true);
+            do_reduced_row_echelon(AB);
         }
 
-        cache_.inverse.is = I.row_space_;
+        cache_.inverse.is = B.row_space_;
         cache_.inverse.valid = true;
-        return I;
+        return B;
     }
 
     Matrix Matrix::transpose() const {

@@ -87,7 +87,19 @@ namespace Objects {
         return *this;
     }
 
-    [[nodiscard]] dim_t Span::rank() const { return cache_.rank.is; }
+    [[nodiscard]] dim_t Span::rank() const {
+        cache_.rank.valid = false;
+        if (!cache_.rank.valid) {
+            Matrix A = Matrix(*this).row_echelon();
+            cache_.rank.is = 0;
+            for (size_t row = 0; row < A.rows(); row++) {
+                if (A.get_row(row).norm() != 0) cache_.rank.is++;
+            }
+        }
+
+        cache_.rank.valid = true;
+        return cache_.rank.is;
+    }
     [[nodiscard]] dim_t Span::vector_dimension() const { return space_[0].dimension(); }
     [[nodiscard]] size_t Span::size() const { return cache_.count.is; }
 
