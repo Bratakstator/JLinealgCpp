@@ -173,6 +173,36 @@ namespace Objects {
     }
 
 
+    bool Matrix::invertible() const {
+        if (cache_.invertible.valid) return cache_.invertible.is;
+
+        if (rows() != columns()) {
+            cache_.invertible = {false, true};
+            return false;
+        }
+
+        Matrix A(1);
+        if (cache_.REF.valid) {
+            A = Matrix(cache_.REF.is);
+        }
+        else {
+            A = Matrix(row_space_);
+            Matrix B(rows(), 1);
+            AugmentedMatrix AB(A, B);
+
+            do_row_echelon(AB);
+        }
+
+        for (size_t pivot = 0; pivot < rows(); pivot++) if (A[pivot, pivot] == 0) {
+            cache_.invertible = {false, true};
+            return false;
+        }
+
+        cache_.invertible = {true, true};
+        return true;
+    }
+
+
     size_t Matrix::rows() const { return row_space_.size(); }
     size_t Matrix::columns() const { return row_space_.vector_dimension(); }
     size_t Matrix::rank() const { return row_space_.rank(); }

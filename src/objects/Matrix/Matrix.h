@@ -332,6 +332,10 @@ namespace Objects {
          * Returns whether this matrix is an identity matrix.
          */
         [[nodiscard]] bool identity() const;
+        /**
+        * Returns whether this matrix is invertible.
+        */
+        [[nodiscard]] bool invertible() const;
 
         [[nodiscard]] size_t rows() const;
         [[nodiscard]] size_t columns() const;

@@ -21,6 +21,18 @@ namespace Objects {
     }
 
     void Matrix::do_row_echelon(const AugmentedMatrix &AB, const bool pivots_must_be_one) {
+        auto [is, valid] = AB.A().cache_.REF_force_eq_one; // NOLINT
+        if (AB.A().cache_.REF.valid && (is && valid) == pivots_must_be_one) return;
+
+        if (AB.A().cache_.identity.valid && AB.A().cache_.identity.is) return;
+
+        is = AB.A().cache_.diagonal.is;
+        valid = AB.A().cache_.diagonal.valid;
+        if ((is && valid) && pivots_must_be_one) {
+            for (size_t pivot = 0; pivot < AB.A().rows(); pivot++) AB[pivot] /= AB.A()[pivot, pivot];
+            return;
+        }
+
         for (size_t pivot = 0; pivot < AB.A().rows(); pivot++) {
             auto pivot_col = pivot;
 
@@ -54,6 +66,17 @@ namespace Objects {
     }
 
     void Matrix::do_reduced_row_echelon(const AugmentedMatrix &AB) {
+        if (AB.A().cache_.RREF.valid) return;
+
+        auto [is, valid] = AB.A().cache_.identity;
+        if (is && valid) return;
+
+        do_row_echelon(AB, true);
+
+        is = AB.A().cache_.diagonal.is;
+        valid = AB.A().cache_.diagonal.valid;
+        if (is && valid) return;
+
         for (size_t pivot_complement = 0; pivot_complement < AB.A().rows(); pivot_complement++) {
             const auto pivot = (AB.A().rows() - 1) - pivot_complement;
             auto [pivot_col, code] = AB.A().get_first_non_zero_col(pivot);
@@ -86,67 +109,50 @@ namespace Objects {
     }
 
     Matrix Matrix::row_echelon(const bool pivots_must_be_one) const {
-        if (auto [i, v] = cache_.REF_force_eq_one;
-            cache_.REF.valid && ((i && v) == pivots_must_be_one)) return Matrix(cache_.REF.is);
-        if (cache_.identity.is && cache_.identity.valid) return *this;
+        Matrix A(row_space_);
+        Matrix B(rows(), 1);
+        AugmentedMatrix AB(A, B);
 
-        Matrix ech(row_space_);
-        if (auto [is, valid] = cache_.diagonal; (is && valid) && pivots_must_be_one) {
-            for (size_t p = 0; p < ech.rows(); p++) ech[p, p] = 1;
-        }
-        else {
-            Matrix B(rows(), 1);
-            AugmentedMatrix AB(ech, B);
-            do_row_echelon(AB, pivots_must_be_one);
-        }
+        do_row_echelon(AB, pivots_must_be_one);
 
+        cache_.REF.is = A.row_space_;
         cache_.REF.valid = true;
-        cache_.REF_force_eq_one.is = cache_.REF_force_eq_one.valid = pivots_must_be_one;
-        cache_.REF.is = ech.row_space_;
-        return ech;
+
+        cache_.REF_force_eq_one.is = pivots_must_be_one;
+        cache_.REF_force_eq_one.valid = true;
+
+        return A;
     }
 
     Matrix Matrix::reduced_row_echelon() const {
-        if (cache_.RREF.valid) return Matrix(cache_.RREF.is);
-        if (auto [is, valid] = cache_.identity; is && valid) return *this;
+        Matrix A = row_echelon(true);
+        Matrix B(rows(), 1);
+        AugmentedMatrix AB(A, B);
 
-        Matrix ech = row_echelon(true);
-        if (auto [is, valid] = cache_.diagonal; !(is && valid)) {
-            Matrix B(rows(), 1);
-            AugmentedMatrix AB(ech, B);
-            do_reduced_row_echelon(AB);
-        }
+        do_reduced_row_echelon(AB);
 
+        cache_.RREF.is = A.row_space_;
         cache_.RREF.valid = true;
-        cache_.RREF.is = ech.row_space_;
-        return ech;
+
+        return A;
     }
 
     Matrix Matrix::invert() const {
         if (cache_.inverse.valid) return Matrix(cache_.inverse.is);
 
-        if (!cache_.invertible.valid) {
-            if (rows() != columns()) {
-                cache_.invertible = {false, true};
-                throw std::invalid_argument("Matrix is not square.");
-            }
-            cache_.invertible = {true, true};
+        if (!invertible()) {
+            throw std::invalid_argument("Matrix is not invertible.");
         }
 
+        Matrix A(row_space_);
         Matrix B(rows());
-        if (cache_.diagonal.valid && cache_.diagonal.is) {
-            if (cache_.identity.valid && cache_.identity.is) return *this;
-            for (size_t pivot = 0; pivot < rows(); pivot++) B[pivot, pivot] = 1/(*this)[pivot, pivot];
-        }
-        else {
-            Matrix A = *this;
-            AugmentedMatrix AB(A, B);
-            do_row_echelon(AB, true);
-            do_reduced_row_echelon(AB);
-        }
+        AugmentedMatrix AB(A, B);
+
+        do_reduced_row_echelon(AB);
 
         cache_.inverse.is = B.row_space_;
         cache_.inverse.valid = true;
+
         return B;
     }
 
