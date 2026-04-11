@@ -133,6 +133,7 @@ namespace Objects {
     inline Vector operator+(Vector l, const Vector &r) { return l += r; }
     inline Vector operator-(Vector l, const Vector &r) { return l -= r; }
     inline Vector operator*(Vector l, const component_t &r) { return l *= r; }
+    inline Vector operator*(const component_t &l, Vector r) { return r *= l; }
     inline Vector operator/(Vector l, const component_t &r) { return l /= r; }
 } // Objects
 
