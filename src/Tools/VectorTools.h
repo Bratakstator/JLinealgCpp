@@ -27,6 +27,14 @@ namespace Tools::VectorTools {
         }
         return A;
     }
+
+    Objects::Matrix projection_matrix(const Objects::Vector &a) {
+        return outer_product(a, a) / inner_product(a, a);
+    }
+
+    Objects::Vector project(const Objects::Vector &a, const Objects::Vector &b) {
+        return (inner_product(a, b)/inner_product(a, a)) * b;
+    }
 }
 
 #endif //JLINEALGCPP_VECTORTOOLS_H
