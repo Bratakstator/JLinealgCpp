@@ -158,6 +158,8 @@ namespace Objects {
 
         friend AugmentedMatrixVectorPair<Vector> operator*
             (const component_t &component, AugmentedMatrixVectorPair<Vector> v);
+        friend AugmentedMatrixVectorPair<Vector> operator*
+            (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v);
 
         friend class AugmentedMatrixVectorPair<VectorProxy>;
         friend class AugmentedMatrixVectorPair<Vector>;
@@ -177,7 +179,9 @@ namespace Objects {
         }
 
         operator Vector() const { return v1_; }
-        operator AugmentedMatrixVectorPair<Vector>() const { return {v1_, v2_, v1_cache_, v2_cache_}; }
+        operator AugmentedMatrixVectorPair<Vector>() const {
+            return AugmentedMatrixVectorPair<Vector>(v1_, v2_, v1_cache_, v2_cache_);
+        }
 
         template<VectorProxyOnly K>
         AugmentedMatrixVectorPair& operator-=(const AugmentedMatrixVectorPair<K> &v) {
@@ -218,6 +222,10 @@ namespace Objects {
     inline AugmentedMatrixVectorPair<Vector> operator*
         (const component_t &component, AugmentedMatrixVectorPair<Vector> v) {
         return {v.v1_ *= component, v.v2_ *= component, v.v1_cache_, v.v2_cache_};
+    }
+    inline AugmentedMatrixVectorPair<Vector> operator*
+        (const component_t &component, AugmentedMatrixVectorPair<VectorProxy> v) { // NOLINT
+        return component * AugmentedMatrixVectorPair<Vector>(v);
     }
 
     //inline AugmentedMatrixVectorPair<VectorProxy> operator-=
