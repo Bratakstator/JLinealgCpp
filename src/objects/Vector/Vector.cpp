@@ -73,24 +73,6 @@ namespace Objects {
     }
 
 
-    component_t Vector::inner_product(const Vector &other) const {
-        component_t sum = 0;
-        for (size_t i = 0; i < cache_.n.is; i++) sum += components_[i] * components_[i];
-        return sum;
-    }
-
-    Matrix Vector::outer_product(const Vector &other) const {
-        Matrix A(dimension(), other.dimension());
-
-        for (int row = 0; row < dimension(); row++) {
-            for (int col = 0; col < other.dimension(); col++) {
-                A[row, col] = (*this)[row] * other[col];
-            }
-        }
-        return A;
-    }
-
-
     [[nodiscard]] dim_t Vector::dimension() const { return cache_.n.is; }
     [[nodiscard]] bool Vector::is_null_vec() const { return norm() == 0; }
 } // Objects

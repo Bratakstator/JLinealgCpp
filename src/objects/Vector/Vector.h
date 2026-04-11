@@ -110,14 +110,6 @@ namespace Objects {
          * Returns the norm (length) of the vector.
          */
         norm_t norm() const;
-        /**
-         * Returns the inner product of the vector.
-         */
-        component_t inner_product(const Vector &other) const;
-        /**
-         * Returns the outer product of the vector.
-         */
-        Matrix outer_product(const Vector &other) const;
 
         /**
          * @brief Returns the dimension the vector belongs to.\n
