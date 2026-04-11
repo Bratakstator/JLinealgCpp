@@ -33,7 +33,7 @@ namespace Tools::VectorTools {
     }
 
     Objects::Vector project(const Objects::Vector &a, const Objects::Vector &b) {
-        return (inner_product(a, b)/inner_product(a, a)) * b;
+        return (inner_product(a, b)/inner_product(a, a)) * a;
     }
 }
 

@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "../../Tools/VectorTools.h"
 #include "../Matrix/Matrix.h"
 
 namespace Objects {
@@ -70,6 +71,25 @@ namespace Objects {
         cache_.rank = {0, true};
         Span copy(*this);
     }
+
+
+    Span Span::orthonormal_basis() const {
+        if (size() != vector_dimension()) throw std::invalid_argument("size() and vector_dimension() incompatible.");
+
+        Span ob(size(), vector_dimension());
+        for (size_t vec = 0; vec < size(); vec++) {
+            Vector v((*this)[vec]);
+            for (size_t errors = 0; errors < vec; errors++) {
+                Vector u = ob[errors];
+                v -= Tools::VectorTools::project(u, (*this)[vec]);
+            }
+            v /= v.norm();
+            ob[vec] = v;
+        }
+
+        return Span(ob);
+    }
+
 
     Span& Span::swap(const size_t p1, const size_t p2) {
         if (cache_.count.is == 0) return *this;

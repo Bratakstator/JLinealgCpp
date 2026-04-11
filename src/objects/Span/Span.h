@@ -97,6 +97,10 @@ namespace Objects {
         VectorProxy operator[](size_t i);
         Vector operator[](size_t i) const;
 
+
+        Span orthonormal_basis() const;
+
+
         /**
          * Swaps the place of two vectors.\n
          * Returns itself.
