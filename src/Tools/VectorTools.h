@@ -6,7 +6,6 @@
 #define JLINEALGCPP_VECTORTOOLS_H
 
 #include "../objects/Matrix/Matrix.h"
-#include "../objects/Vector/Vector.h"
 
 namespace Tools::VectorTools {
     using component_t = Objects::component_t;
