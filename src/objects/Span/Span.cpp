@@ -90,6 +90,19 @@ namespace Objects {
         return Span(ob);
     }
 
+    std::pair<Span, Span> Span::QR() const {
+        Span Q = orthonormal_basis();
+        Span R(size(), vector_dimension());
+
+        for (size_t row = 0; row < size(); row++) {
+            for (size_t col = row; col < vector_dimension(); col++) {
+                R[row][col] = Tools::VectorTools::inner_product(Q[row], (*this)[col]);
+            }
+        }
+
+        return std::make_pair(Q, R);
+    }
+
 
     Span& Span::swap(const size_t p1, const size_t p2) {
         if (cache_.count.is == 0) return *this;

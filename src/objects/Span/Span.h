@@ -100,6 +100,8 @@ namespace Objects {
 
         Span orthonormal_basis() const;
 
+        std::pair<Span, Span> QR() const;
+
 
         /**
          * Swaps the place of two vectors.\n
