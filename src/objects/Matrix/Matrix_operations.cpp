@@ -3,8 +3,6 @@
 //
 
 #include "Matrix.h"
-#include "../Span/Span.h"
-#include "../Vector/Vector.h"
 
 namespace Objects {
     code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) { // NOLINT

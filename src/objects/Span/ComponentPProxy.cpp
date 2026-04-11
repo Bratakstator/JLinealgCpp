@@ -2,9 +2,7 @@
 // Created by JoakimKB on 29.03.2026.
 //
 
-#include "../Matrix/Matrix.h"
 #include "Span.h"
-#include "../Vector/Vector.h"
 
 namespace Objects {
     ComponentPProxy::operator component_t() const { return proxy_; }

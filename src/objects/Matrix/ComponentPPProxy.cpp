@@ -3,8 +3,6 @@
 //
 
 #include "Matrix.h"
-#include "../Span/Span.h"
-#include "../Vector/Vector.h"
 
 namespace Objects {
     ComponentPPProxy::operator component_t() const { return proxy_; } // NOLINT

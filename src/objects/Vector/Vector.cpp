@@ -4,8 +4,6 @@
 
 #include <cmath>
 
-#include "../Matrix/Matrix.h"
-#include "../Span/Span.h"
 #include "Vector.h"
 
 namespace Objects {

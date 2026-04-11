@@ -5,8 +5,6 @@
 #ifndef JLINEALGCPP_SPAN_H
 #define JLINEALGCPP_SPAN_H
 
-#include <iostream>
-
 #include "../Vector/Vector.h"
 
 //  ________________

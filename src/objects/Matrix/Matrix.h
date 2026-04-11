@@ -5,9 +5,9 @@
 #ifndef JLINEALGCPP_MATRIX_H
 #define JLINEALGCPP_MATRIX_H
 
+#include <iostream>
 #include <iomanip>
 
-#include "../../logging/Logger.h"
 #include "../Span/Span.h"
 
 namespace Objects {

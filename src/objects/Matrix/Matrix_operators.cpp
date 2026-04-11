@@ -3,8 +3,6 @@
 //
 
 #include "Matrix.h"
-#include "../Span/Span.h"
-#include "../Vector/Vector.h"
 
 namespace Objects {
     ComponentPPProxy Matrix::operator[](const size_t m, const size_t n) {
