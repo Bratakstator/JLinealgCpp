@@ -19,7 +19,9 @@ namespace Objects {
                 v -= Tools::VectorTools::project(u, get_column(col));
             }
 
-            v /= v.norm();
+            auto norm = v.norm();
+            v /= norm;
+            if (v.norm() < norm * 1e-12) continue;
             unit_vectors.push_back(v);
         }
 
