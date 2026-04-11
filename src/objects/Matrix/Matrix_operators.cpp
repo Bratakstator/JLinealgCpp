@@ -15,28 +15,69 @@ namespace Objects {
         return row_space_[m][n];
     }
 
-    Matrix Matrix::operator*(const Matrix &other) {
-        if (identity() && other.identity()) return *this;
-        if (identity()) return {other};
-        if (other.identity()) return {*this};
 
-        if (columns() != other.rows()) {
-            throw std::invalid_argument(
-                std::string("Matrix A columns and matrix B rows does not match.\n")
-            );
+    Matrix& Matrix::operator+=(const Matrix &B) {
+        if (!(rows() == B.rows() && columns() == B.columns())) throw std::invalid_argument("Matrices not of equal size.");
+
+        for (size_t row = 0; row < rows(); row ++) {
+            for (size_t col = 0; col < columns(); col++) {
+                (*this)[row, col] += B[row, col];
+            }
+        }
+        return *this;
+    }
+
+    Matrix& Matrix::operator-=(const Matrix &B) {
+        if (!(rows() == B.rows() && columns() == B.columns())) throw std::invalid_argument("Matrices not of equal size.");
+
+        for (size_t row = 0; row < rows(); row ++) {
+            for (size_t col = 0; col < columns(); col++) {
+                (*this)[row, col] -= B[row, col];
+            }
+        }
+        return *this;
+    }
+
+    Matrix& Matrix::operator*=(const Matrix &B) {
+        if (B.identity()) return *this;
+        if (identity()) {
+            (*this) = B;
+            return *this;
         }
 
-        Matrix C(Span(rows(), other.columns()));
+        if (columns() != B.rows()) throw std::invalid_argument("Matrices not of compatible sizes.");
+
+        Matrix A(*this);
+        (*this) = Matrix(rows(), B.columns());
+
         for (size_t row = 0; row < rows(); row++) {
-            for (size_t col = 0; col < other.columns(); col++) {
-                for (size_t cxr = 0; cxr < columns(); cxr++) {
-                    C[row, col] += (*this)[row, cxr] * other[cxr, col];
+            for (size_t col = 0; col < columns(); col++) {
+                for (size_t cxr = 0; cxr < A.columns(); cxr++) {
+                    (*this)[row, col] += A[row, cxr] * B[cxr, col];
                 }
             }
         }
-
-        return C;
+        return *this;
     }
+
+    Matrix& Matrix::operator*=(const component_t c) {
+        for (size_t row = 0; row < rows(); row++) {
+            for (size_t col = 0; col < columns(); col++) {
+                (*this)[row, col] *= c;
+            }
+        }
+        return *this;
+    }
+
+    Matrix& Matrix::operator/=(const component_t c) {
+        for (size_t row = 0; row < rows(); row++) {
+            for (size_t col = 0; col < columns(); col++) {
+                (*this)[row, col] /= c;
+            }
+        }
+        return *this;
+    }
+
 
     Vector Matrix::get_column(const size_t n) const {
         if (n >= columns()) throw std::out_of_range("Column index out of range");

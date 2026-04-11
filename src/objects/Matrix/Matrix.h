@@ -140,6 +140,7 @@ namespace Objects {
         ComponentPPProxy& operator=(const ComponentPPProxy &component);
         ComponentPPProxy& operator+=(component_t component);
         ComponentPPProxy& operator-=(component_t component);
+        ComponentPPProxy& operator*=(component_t component);
         ComponentPPProxy& operator/=(component_t component);
     };
 
@@ -279,7 +280,13 @@ namespace Objects {
 
         ComponentPPProxy operator[](size_t m, size_t n); // NOLINT
         component_t operator[](size_t m, size_t n) const;
-        Matrix operator*(const Matrix &other);
+
+        Matrix& operator+=(const Matrix &B);
+        Matrix& operator-=(const Matrix &B);
+        Matrix& operator*=(const Matrix &B);
+
+        Matrix& operator*=(component_t c);
+        Matrix& operator/=(component_t c);
 
         [[nodiscard]] Vector get_column(size_t n) const;
         [[nodiscard]] Vector get_row(size_t m) const;
@@ -345,6 +352,29 @@ namespace Objects {
 
         friend class AugmentedMatrix;
     };
+
+    inline Matrix operator+(Matrix A, const Matrix &B) { return A += B; }
+    inline Matrix operator-(Matrix A, const Matrix &B) { return A -= B; }
+    inline Matrix operator*(Matrix A, const Matrix &B) { return A *= B; }
+
+    inline Vector operator*(const Matrix &A, const Vector &v) {
+        if (A.columns() != v.dimension()) throw std::invalid_argument("Matrix and vector of incompatible sizes.");
+
+        Vector w(v.dimension());
+        for (size_t row = 0; row < A.rows(); row++) {
+            for (size_t col = 0; col < A.columns(); col++) {
+                w[row] += A[row, col] * v[col];
+            }
+        }
+        return w;
+    }
+    inline Vector operator*(const Vector &v, const Matrix &A) {
+        return A.transpose() * v;
+    }
+
+    inline Matrix operator*(Matrix A, const component_t &c) { return A *= c; }
+    inline Matrix operator*(const component_t &c, Matrix A) { return A *= c; }
+    inline Matrix operator/(Matrix A, const component_t &c) { return A /= c; }
 
     class AugmentedMatrix {
         Matrix &A_;
