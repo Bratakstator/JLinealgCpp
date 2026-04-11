@@ -29,7 +29,18 @@ namespace Objects {
             space_[i] = Vec;
             i++;
         }
-        set_dim();
+    }
+
+    Span::Span(const std::vector<Vector> &set) {
+        cache_ = {
+            {set.size(), true},
+            {0, false}
+        };
+        space_ = new Vector[cache_.count.is];
+
+        for (size_t i = 0; i < cache_.count.is; i++) {
+            space_[i] = set[i];
+        }
     }
 
     Span::Span(const Span &other) {
@@ -70,37 +81,6 @@ namespace Objects {
     void Span::set_dim() const {
         cache_.rank = {0, true};
         Span copy(*this);
-    }
-
-
-    Span Span::orthonormal_basis() const {
-        if (size() != vector_dimension()) throw std::invalid_argument("size() and vector_dimension() incompatible.");
-
-        Span ob(size(), vector_dimension());
-        for (size_t vec = 0; vec < size(); vec++) {
-            Vector v((*this)[vec]);
-            for (size_t errors = 0; errors < vec; errors++) {
-                Vector u = ob[errors];
-                v -= Tools::VectorTools::project(u, (*this)[vec]);
-            }
-            v /= v.norm();
-            ob[vec] = v;
-        }
-
-        return Span(ob);
-    }
-
-    std::pair<Span, Span> Span::QR() const {
-        Span Q = orthonormal_basis();
-        Span R(size(), vector_dimension());
-
-        for (size_t row = 0; row < size(); row++) {
-            for (size_t col = row; col < vector_dimension(); col++) {
-                R[row][col] = Tools::VectorTools::inner_product(Q[row], (*this)[col]);
-            }
-        }
-
-        return std::make_pair(Q, R);
     }
 
 

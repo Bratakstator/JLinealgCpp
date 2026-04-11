@@ -14,6 +14,81 @@ namespace Objects {
     using det_t = component_t;
     using code_t = int;
 
+
+    struct MatrixRaw {
+        size_t m;
+        size_t n;
+        component_t **elements_;
+
+        MatrixRaw() {
+            m = 1;
+            n = 1;
+
+            elements_ = new component_t*[m];
+            for (size_t row = 0; row < m; row++) elements_[row] = new component_t[n];
+            zero_out();
+        }
+
+        MatrixRaw(const size_t rows, const size_t columns) {
+            m = rows;
+            n = columns;
+
+            elements_ = new component_t*[m];
+            for (size_t row = 0; row < m; row++) elements_[row] = new component_t[n];
+            zero_out();
+        }
+
+        MatrixRaw(const Span &S, const bool transpose=false) {
+            if (transpose) {
+                m = S.size();
+                n = S.vector_dimension();
+            }
+            else {
+                m = S.vector_dimension();
+                n = S.size();
+            }
+
+            elements_ = new component_t*[m];
+            for (int row = 0; row < m; row++) elements_[row] = new component_t[n];
+
+            for (size_t row = 0; row < m; row++) {
+                for (size_t col = 0; col < n; col++) {
+                    if (transpose) elements_[row][col] = S[row][col];
+                    else elements_[row][col] = S[col][row];
+                }
+            }
+        }
+
+        ~MatrixRaw() {
+            for (size_t i = 0; i < m; i++) delete[] elements_[i];
+            delete[] elements_;
+        }
+
+
+        component_t& operator[](const size_t row, const size_t column) { return elements_[row][column]; } // NOLINT
+        component_t operator[](const size_t row, const size_t column) const { return elements_[row][column]; }
+
+        [[nodiscard]] Vector row(const size_t i) const {
+            Vector v(n);
+            for (size_t col = 0; col < n; col++) v[col] = elements_[i][col];
+            return v;
+        }
+        [[nodiscard]] Vector column(const size_t i) const {
+            Vector v(m);
+            for (size_t row = 0; row < m; row++) v[row] = elements_[row][i];
+            return v;
+        }
+
+    private:
+        void zero_out() { // NOLINT
+            for (size_t row = 0; row < m; row++) {
+                for (size_t col = 0; col < n; col++) {
+                    elements_[row][col] = 0;
+                }
+            }
+        }
+    };
+
     /**
      * Struct containing an index / value and return code of a method.\n
      * This is with the assumption of the method using this struct is capable of self-correcting if code indicates
@@ -36,8 +111,8 @@ namespace Objects {
     };
 
     struct QR {
-        mutable Span Q;
-        mutable Span R;
+        mutable MatrixRaw Q;
+        mutable MatrixRaw R;
     };
 
     struct MatrixCache {
@@ -322,6 +397,11 @@ namespace Objects {
          * The reduced copy will be stored in this matrix's echelons struct in echelons_.RREF and returned.
          */
         Matrix reduced_row_echelon() const;
+
+
+        Span gram_schmidt() const;
+        QR qr_gram_schmidt() const;
+
 
         /**
          * @brief Returns the inverted matrix.

@@ -5,6 +5,8 @@
 #ifndef JLINEALGCPP_SPAN_H
 #define JLINEALGCPP_SPAN_H
 
+#include <vector>
+
 #include "../Vector/Vector.h"
 
 //  ________________
@@ -83,6 +85,7 @@ namespace Objects {
          * Creates a span from initializer list.
          */
         explicit Span(std::initializer_list<Vector> space);
+        Span(const std::vector<Vector> &set);
         /**
          * Makes a copy of another span.
          */
@@ -96,11 +99,6 @@ namespace Objects {
         Span& operator=(const Span &other);
         VectorProxy operator[](size_t i);
         Vector operator[](size_t i) const;
-
-
-        Span orthonormal_basis() const;
-
-        std::pair<Span, Span> QR() const;
 
 
         /**

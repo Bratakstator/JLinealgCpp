@@ -10,7 +10,7 @@
 namespace Tools::VectorTools {
     using component_t = Objects::component_t;
 
-    component_t inner_product(const Objects::Vector &u, const Objects::Vector &v) {
+    inline component_t inner_product(const Objects::Vector &u, const Objects::Vector &v) {
         if (u.dimension() != v.dimension()) throw std::invalid_argument("Vector sizes does not match.");
 
         component_t sum = 0;
@@ -18,7 +18,7 @@ namespace Tools::VectorTools {
         return sum;
     }
 
-    Objects::Matrix outer_product(const Objects::Vector &u, const Objects::Vector &v) {
+    inline Objects::Matrix outer_product(const Objects::Vector &u, const Objects::Vector &v) {
         Objects::Matrix A(u.dimension(), v.dimension());
         for (size_t row = 0; row < A.rows(); row++) {
             for (size_t col = 0; col < A.columns(); col++) {
@@ -28,11 +28,11 @@ namespace Tools::VectorTools {
         return A;
     }
 
-    Objects::Matrix projection_matrix(const Objects::Vector &a) {
+    inline Objects::Matrix projection_matrix(const Objects::Vector &a) {
         return outer_product(a, a) / inner_product(a, a);
     }
 
-    Objects::Vector project(const Objects::Vector &a, const Objects::Vector &b) {
+    inline Objects::Vector project(const Objects::Vector &a, const Objects::Vector &b) {
         return (inner_product(a, b)/inner_product(a, a)) * a;
     }
 }
