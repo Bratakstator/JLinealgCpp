@@ -13,7 +13,7 @@
 //  | a7 | a8 | a9 |}
 //  ----------------
 
-namespace Objects {
+namespace Objects_OLD {
     using component_t = double;
     using norm_t = double;
     using size_t = std::initializer_list<component_t>::size_type;

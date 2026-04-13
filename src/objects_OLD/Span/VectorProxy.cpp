@@ -4,7 +4,7 @@
 
 #include "Span.h"
 
-namespace Objects {
+namespace Objects_OLD {
     VectorProxy::operator Vector() { return vector_; } // NOLINT
 
     VectorProxy& VectorProxy::operator=(const Vector &other) {

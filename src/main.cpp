@@ -1,9 +1,9 @@
 #include "logging/Logger.h"
-#include "objects/Matrix/Matrix.h"
-#include "objects/Vector/Vector.h"
+#include "objects_OLD/Matrix/Matrix.h"
+#include "objects_OLD/Vector/Vector.h"
 
-using Objects::Vector;
-using Objects::Matrix;
+using Objects_OLD::Vector;
+using Objects_OLD::Matrix;
 
 int main() {
     // Fix how proxies function
@@ -43,7 +43,7 @@ int main() {
     I.print();
 
     std::cout << "A | A^-1:\n";
-    Objects::AugmentedMatrix AM(A, I);
+    Objects_OLD::AugmentedMatrix AM(A, I);
     AM.print();
     std::cout << "Verifying actual inverse by doing A * A^-1:\n";
     Matrix AI = A * I;

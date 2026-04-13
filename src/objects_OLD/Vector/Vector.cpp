@@ -6,7 +6,7 @@
 
 #include "Vector.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Vector::Vector() {
         components_ = new component_t[1];
         components_[0] = 0;

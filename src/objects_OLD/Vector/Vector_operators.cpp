@@ -6,7 +6,7 @@
 
 #include "Vector.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Vector& Vector::operator=(const Vector &other) {
         if (this == &other) return *this;
         cache_ = other.cache_;

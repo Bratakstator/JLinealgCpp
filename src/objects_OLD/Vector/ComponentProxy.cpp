@@ -4,7 +4,7 @@
 
 #include "Vector.h"
 
-namespace Objects {
+namespace Objects_OLD {
     ComponentProxy::operator component_t() const {
         return component_;
     }

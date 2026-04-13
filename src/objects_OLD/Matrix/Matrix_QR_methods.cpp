@@ -7,7 +7,7 @@
 #include "Matrix.h"
 #include "../../Tools/VectorTools.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Span Matrix::gram_schmidt() const {
         std::vector<Vector> unit_vectors;
 

@@ -4,7 +4,7 @@
 
 #include "Matrix.h"
 
-namespace Objects {
+namespace Objects_OLD {
     code_t Matrix::swap_rows(const size_t r1, const size_t r2, const code_t code) { // NOLINT
         if (code != 0) return 128 + code;
         if (r1 == r2) return 1;

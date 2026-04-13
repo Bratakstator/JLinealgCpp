@@ -4,7 +4,7 @@
 
 #include "Matrix.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Matrix::Matrix(const size_t n) {
         row_space_ = Span(n, n);
 

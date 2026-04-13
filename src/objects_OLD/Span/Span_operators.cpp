@@ -6,7 +6,7 @@
 
 #include "Span.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Span& Span::operator=(const Span &other) {
         if (this == &other) return *this;
 

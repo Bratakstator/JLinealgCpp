@@ -4,7 +4,7 @@
 
 #include "Matrix.h"
 
-namespace Objects {
+namespace Objects_OLD {
     ComponentPPProxy Matrix::operator[](const size_t m, const size_t n) {
         auto proxy = row_space_[m][n];
         return {proxy, cache_};

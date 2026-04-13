@@ -4,17 +4,17 @@ project(JLinealgCpp)
 set(CMAKE_CXX_STANDARD 23)
 
 add_executable(JLinealgCpp src/main.cpp
-        src/objects/Matrix/Matrix_operators.cpp
-        src/objects/Matrix/Matrix.cpp
-        src/objects/Span/Span.cpp
-        src/objects/Span/Span_operators.cpp
-        src/objects/Vector/Vector.cpp
-        src/objects/Vector/Vector_operators.cpp
-        src/objects/Vector/ComponentProxy.cpp
-        src/objects/Span/VectorProxy.cpp
-        src/objects/Matrix/Matrix_operations.cpp
+        src/objects_OLD/Matrix/Matrix_operators.cpp
+        src/objects_OLD/Matrix/Matrix.cpp
+        src/objects_OLD/Span/Span.cpp
+        src/objects_OLD/Span/Span_operators.cpp
+        src/objects_OLD/Vector/Vector.cpp
+        src/objects_OLD/Vector/Vector_operators.cpp
+        src/objects_OLD/Vector/ComponentProxy.cpp
+        src/objects_OLD/Span/VectorProxy.cpp
+        src/objects_OLD/Matrix/Matrix_operations.cpp
         src/Tools/VectorTools.h
-        src/objects/Span/ComponentPProxy.cpp
-        src/objects/Matrix/ComponentPPProxy.cpp
-        src/objects/Matrix/Matrix_QR_methods.cpp
+        src/objects_OLD/Span/ComponentPProxy.cpp
+        src/objects_OLD/Matrix/ComponentPPProxy.cpp
+        src/objects_OLD/Matrix/Matrix_QR_methods.cpp
 )

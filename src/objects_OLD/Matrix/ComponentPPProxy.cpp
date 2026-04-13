@@ -4,7 +4,7 @@
 
 #include "Matrix.h"
 
-namespace Objects {
+namespace Objects_OLD {
     ComponentPPProxy::operator component_t() const { return proxy_; } // NOLINT
 
     ComponentPPProxy& ComponentPPProxy::operator=(const component_t component) {

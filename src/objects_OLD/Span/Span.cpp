@@ -7,7 +7,7 @@
 #include "../../Tools/VectorTools.h"
 #include "../Matrix/Matrix.h"
 
-namespace Objects {
+namespace Objects_OLD {
     Span::Span() {
         space_ = new Vector[1];
 

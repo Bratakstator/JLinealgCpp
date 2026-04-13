@@ -4,7 +4,7 @@
 
 #include "Span.h"
 
-namespace Objects {
+namespace Objects_OLD {
     ComponentPProxy::operator component_t() const { return proxy_; }
 
     ComponentPProxy& ComponentPProxy::operator=(const component_t component) {
