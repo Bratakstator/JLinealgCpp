@@ -6,50 +6,6 @@ using Objects_OLD::Vector;
 using Objects_OLD::Matrix;
 
 int main() {
-    // Fix how proxies function
-    Logging::setup();
-
-    Matrix A(
-        {
-            {3, 3, 3},
-            {4, 5, 2},
-            {2, 6, 3}
-        }
-    );
-    Matrix B(
-        {
-            {4, 5, 2},
-            {3, 3, 3},
-            {2, 6, 3}
-        }
-    );
-
-    std::cout << "Matrix A:\n";
-    A.print();
-    std::cout << "A's row echelon form:\n";
-    A.row_echelon().print();
-    std::cout << "det(A) = " <<  A.determinant() << "\n\n";
-
-    std::cout << "Matrix B:\n";
-    B.print();
-    std::cout << "B's row echelon form:\n";
-    B.row_echelon().print();
-    std::cout << "det(B) = " << B.determinant() << "\n\n";
-
-    std::cout << "Inverting A:\n";
-    Matrix I = A.invert();
-
-    std::cout << "A inverse =\n";
-    I.print();
-
-    std::cout << "A | A^-1:\n";
-    Objects_OLD::AugmentedMatrix AM(A, I);
-    AM.print();
-    std::cout << "Verifying actual inverse by doing A * A^-1:\n";
-    Matrix AI = A * I;
-    AI.print();
-
-    auto LOL = AI.reduced_row_echelon();
 
     return 0;
 }

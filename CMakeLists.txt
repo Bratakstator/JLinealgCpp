@@ -17,4 +17,6 @@ add_executable(JLinealgCpp src/main.cpp
         src/objects_OLD/Span/ComponentPProxy.cpp
         src/objects_OLD/Matrix/ComponentPPProxy.cpp
         src/objects_OLD/Matrix/Matrix_QR_methods.cpp
+        src/Objects/Matrix/Matrix.cpp
+        src/Objects/Matrix/Matrix.h
 )
